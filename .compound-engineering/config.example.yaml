@@ -66,10 +66,11 @@
 # model in a prompt for a one-off, which overrides these keys.
 #
 # Cross-harness: setting a key means every harness you run these skills in will
-# attempt that model. The host serves it natively where it can; otherwise the
-# Claude CLI is invoked when installed and authenticated; otherwise the step runs
-# on your session model and the run says so. Invalid/commented/missing -> no
-# elevation.
+# attempt that model. Under T3 Code, T3 dispatches it from its live model catalog,
+# so the value may name any model T3 offers. Elsewhere the host serves it natively
+# where it can; otherwise the Claude CLI is invoked when installed and
+# authenticated. Otherwise the step runs on your session model and the run says
+# so. Invalid/commented/missing -> no elevation.
 
 # plan_model: fable              # model alias for plan authoring; candidate preference when a Bake-off runs (no default)
 # brainstorm_model: fable        # model alias for approach generation; candidate preference when a Bake-off runs (no default)
@@ -129,6 +130,8 @@
 # xhigh, antigravity low|medium|high, OpenCode 2.x none|low|medium|high|xhigh|
 # max as each model lists them; cursor/composer routes take none. A value the peer
 # cannot honor skips the pass with a stated reason -- never substituted.
+# Under T3 Code these keys select the T3 provider, model, and reasoning level, and
+# a value T3's live catalog cannot serve skips the pass with a stated reason.
 
 # cross_model_review_mode: off   # auto | off (default: auto)
 # cross_model_peer: codex          # codex | claude | grok | antigravity | cursor | composer | opencode
@@ -162,6 +165,8 @@
 # low|medium|high). OpenCode (2.x) keeps its own per-model default and takes
 # none|low|medium|high|xhigh|max as each model lists them. Cursor routes take no
 # effort. A map in config.local.yaml replaces this one.
+# Under T3 Code, harnesses map to T3 providers and each value must be a level the
+# chosen model lists; a harness left out gets an effort picked for each unit.
 
 # work_engine_effort:
 #   codex: xhigh

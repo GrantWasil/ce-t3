@@ -489,6 +489,69 @@ if [ "${1:-}" = "--emit-adapter" ]; then
   exit 0
 fi
 
+# --- normalize a peer's raw POV into the fold-in artifact -------------------
+# One owner for the published shape: the live route and --normalize-t3 both call
+# this, so a T3 Code child's POV folds in exactly like a CLI peer's.
+normalize_pov() {   # <raw> <out> <voice> <route> <target> <harness> <family> <mreq> <mact> <independent>
+  jq --arg v "$3" --arg route "$4" --arg target "$5" --arg harness "$6" \
+     --arg family "$7" --arg mreq "$8" --arg mact "$9" --argjson independent "${10}" \
+     'if ((.voice|type)=="string" and (.voice|length)>0 and (.position|type)=="string" and (.position|length)>0 and (.reasoning|type)=="string" and (.reasoning|length)>0 and (.evidence|type)=="array" and all(.evidence[]; type=="string" and length>0) and (.external_check=="ran" or .external_check=="unavailable") and (.mode=="independent" or .mode=="skeptic") and (.movement=="initial" or .movement=="moved" or .movement=="held") and .final==true)
+      then { voice: $v,
+             cross_model_route: $route,
+             cross_model_target: $target,
+             cross_model_harness: $harness,
+             serving_family: $family,
+             model_requested: $mreq,
+             model_actual: $mact,
+             independence_verified: $independent,
+             position: .position,
+             reasoning: .reasoning,
+             evidence: .evidence,
+             external_check: .external_check,
+             mode: .mode,
+             movement: .movement,
+             final: true }
+      else empty end' \
+     "$1" > "$2" 2>/dev/null
+}
+
+# --- --normalize-t3: publish a T3 Code child's POV, no model call -----------
+# Usage: --normalize-t3 <host-family> <driver-kind> <provider-instance-id>
+#                       <model-requested> <raw-json> <run-dir> <target>
+# Writes <run-dir>/pov-<target>.json (mode 600) and prints its path. T3 returns
+# no served-model receipt, so model_actual stays unverified. Serving family
+# comes from a first-party driver only; any other driver leaves it unknown,
+# which keeps independence_verified false. A non-final or malformed POV is not
+# published. Exit 2: invalid input. Exit 3: nothing usable to publish.
+if [ "${1:-}" = "--normalize-t3" ]; then
+  command -v jq >/dev/null 2>&1 || { echo "jq not installed" >&2; exit 2; }
+  t3_host="${2:-}"; t3_driver="${3:-}"; t3_instance="${4:-}"; t3_mreq="${5:-}"; t3_raw="${6:-}"; t3_dir="${7:-}"
+  case "$t3_host" in codex|claude|grok|composer|gemini|unknown) ;; *) echo "host serving family '$t3_host' invalid (want codex|claude|grok|composer|gemini|unknown)" >&2; exit 2 ;; esac
+  case "$t3_instance" in ''|*[!A-Za-z0-9._-]*) echo "provider instance id '$t3_instance' invalid" >&2; exit 2 ;; esac
+  t3_target="${8:-}"
+  case "$t3_driver:$t3_target" in
+    codex:codex) t3_family=codex ;;
+    claudeAgent:claude) t3_family=claude ;;
+    grok:grok) t3_family=grok ;;
+    cursor:cursor|cursor:composer|cursor:grok|opencode:opencode|antigravity:antigravity) t3_family=unknown ;;
+    *) echo "target '$t3_target' is not served by driver '$t3_driver'" >&2; exit 2 ;;
+  esac
+  [ -n "$t3_mreq" ] || { echo "requested model is required" >&2; exit 2; }
+  [ -f "$t3_raw" ] || { echo "raw output '$t3_raw' not found" >&2; exit 2; }
+  [ -d "$t3_dir" ] || { echo "run-dir '$t3_dir' is not a directory" >&2; exit 2; }
+  t3_independent=false
+  [ "$t3_host" != unknown ] && [ "$t3_family" != unknown ] && [ "$t3_host" != "$t3_family" ] && t3_independent=true
+  t3_out="$t3_dir/pov-$t3_target.json"
+  t3_tmp="$t3_out.tmp.$$"
+  if (umask 077; normalize_pov "$t3_raw" "$t3_tmp" "peer-$t3_target" "t3:$t3_instance" "$t3_target" \
+       "t3:$t3_driver" "$t3_family" "$t3_mreq" unverified "$t3_independent") && [ -s "$t3_tmp" ]; then
+    mv "$t3_tmp" "$t3_out" && chmod 600 "$t3_out" && { echo "$t3_out"; exit 0; }
+  fi
+  rm -f "$t3_tmp"
+  echo "raw output is not a final schema-shaped POV; nothing published" >&2
+  exit 3
+fi
+
 HOST_PROVIDER="${1:-unknown}"
 HOST_HARNESS="${CROSS_MODEL_HOST_HARNESS:-unknown}"
 FIXED_ROUTE="${2:-}"
@@ -1048,29 +1111,9 @@ run_fixed_route() {
     esac
     independence=false
     [ "$HOST_PROVIDER" != "unknown" ] && [ "$serving_family" != "unknown" ] && [ "$HOST_PROVIDER" != "$serving_family" ] && independence=true
-    if jq --arg v "peer-$provider" --arg route "$ACTUAL_ROUTE" \
-         --arg target "$provider" --arg harness "$(route_harness "$ACTUAL_ROUTE")" \
-         --arg family "$serving_family" \
-         --arg mreq "$(route_model "$ACTUAL_ROUTE")" --arg mact "$MODEL_ACTUAL" \
-         --argjson independent "$independence" \
-         'if ((.voice|type)=="string" and (.voice|length)>0 and (.position|type)=="string" and (.position|length)>0 and (.reasoning|type)=="string" and (.reasoning|length)>0 and (.evidence|type)=="array" and all(.evidence[]; type=="string" and length>0) and (.external_check=="ran" or .external_check=="unavailable") and (.mode=="independent" or .mode=="skeptic") and (.movement=="initial" or .movement=="moved" or .movement=="held") and .final==true)
-          then { voice: $v,
-                 cross_model_route: $route,
-                 cross_model_target: $target,
-                 cross_model_harness: $harness,
-                 serving_family: $family,
-                 model_requested: $mreq,
-                 model_actual: $mact,
-                 independence_verified: $independent,
-                 position: .position,
-                 reasoning: .reasoning,
-                 evidence: .evidence,
-                 external_check: .external_check,
-                 mode: .mode,
-                 movement: .movement,
-                 final: true }
-          else empty end' \
-         "$RAW_OUT" > "$_norm" 2>/dev/null; then
+    if normalize_pov "$RAW_OUT" "$_norm" "peer-$provider" "$ACTUAL_ROUTE" "$provider" \
+         "$(route_harness "$ACTUAL_ROUTE")" "$serving_family" \
+         "$(route_model "$ACTUAL_ROUTE")" "$MODEL_ACTUAL" "$independence"; then
       mv "$_norm" "$OUT"
       chmod 600 "$OUT" 2>/dev/null || { rm -f "$OUT"; log "could not make result artifact private"; }
     else

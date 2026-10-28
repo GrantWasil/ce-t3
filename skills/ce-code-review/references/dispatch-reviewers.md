@@ -1,5 +1,7 @@
 ### Stage 4: Spawn sub-agents
 
+Under T3 Code, when `orchestrator_capabilities` and `delegate_task` are callable, read `references/t3-dispatch.md` before assigning a reviewer that needs T3. That adapter owns its transport and terminal collection, including checkpointed waits across turns; the native in-turn collector below applies only to native reviewers. Preserve the same selected roster, prompts, schemas, and finish stages.
+
 #### Inline fast pass (emit before the reviewer queue)
 
 To show findings within seconds, the orchestrator does a quick first-principles scan of the diff it already holds **immediately before the first foreground reviewer dispatch**. Emit the fast-pass block as text, then begin the deterministic reviewer queue without an intervening wait.

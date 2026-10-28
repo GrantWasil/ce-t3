@@ -204,7 +204,7 @@ Templates live next to the skill: `references/example-hard-spec.yaml` for a chea
 
 In-scope files must be clean before measurement. Uncommitted changes in the spec's mutable or immutable paths have to be committed or stashed.
 
-`execution.backend: codex` (in the spec, not as a prompt flag) sends each experiment to `codex exec`. If you are already inside a Codex sandbox, or `.git` is not writable, it falls back to subagents. Three Codex failures in a row disable that backend for the rest of the run.
+`execution.backend: codex` (in the spec, not as a prompt flag) sends each experiment to `codex exec`. If you are already inside a Codex sandbox, or `.git` is not writable, it falls back to subagents. Three Codex failures in a row disable that backend for the rest of the run. Inside T3 Code, T3 sends each experiment to a Codex model instead of `codex exec`, still editing the experiment worktree; `execution.codex_security` does not apply there.
 
 `execution.backend: remote` sends each experiment to a detached worker with its own checkout, on a harness that offers one (a cloud-agent launch whose work lands as a pushed branch or a store file). The worker implements the hypothesis, measures baseline and candidate paired on its own machine, and pushes `optimize-exp/<spec-name>/exp-NNN` with a `result.yaml`. The orchestrator collects that, runs `decide.mjs` on the pair, and before any keep re-measures the candidate itself or through a worker that did not write it. The spec must use a `relative` or `paired` comparison, because absolute numbers from different machines are not comparable. `max_concurrent` caps dispatched workers, and the parallelism probe and worktree budget do not apply. Without a detached-worker capability the run uses `worktree`.
 
