@@ -246,7 +246,7 @@ Not from the Phase 4 menu. Software next steps are `ce-plan` or `lfg` (which pla
 
 When you want a specific model for the heavy reasoning step, `ce-brainstorm` can generate approaches on that model instead of your session model. Only approach generation is dispatched, with read access so it can verify its brief; the rest of the skill stays on your session model. Name a model in the prompt (`use fable`, `have opus generate these`), or set `brainstorm_model: <model>` in CE config.
 
-This works on any harness. The host serves the chosen model natively where it can, otherwise it invokes the Claude CLI (which must be installed and authenticated), otherwise it runs the step on your session model and says which precondition was unmet.
+This works on any harness. The host serves the chosen model natively where it can, otherwise it invokes the Claude CLI (which must be installed and authenticated), otherwise it runs the step on your session model and says which precondition was unmet. Inside T3 Code, T3 dispatches the elevated step from its live model catalog instead; the CLI and ACP routes are not used. See [Under T3 Code](./configuration.md#under-t3-code).
 
 ---
 

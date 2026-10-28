@@ -54,6 +54,12 @@ In Cursor Agent chat:
 
 Or search for "compound engineering" in the Cursor plugin marketplace. Do not run `/add-plugin` in the Grok Bot chat, and do not clone this repository onto the Grok Bot computer.
 
+### T3 Code
+
+Use Compound Engineering through your Claude or Codex host in T3 Code. When T3's orchestration tools are available, model elevation, cross-model reviews, and external implementation workers use T3-managed tasks. Session-model work keeps CE's existing policy; model preferences are configurable and reasoning effort is chosen per task unless pinned. See [T3 configuration and behavior](docs/guides/configuration.md#under-t3-code).
+
+For live development of this fork with Codex, run `bun run codex:dev -- local` from this checkout and start a new session. This links the checkout's current skills; a marketplace installation uses a cached snapshot.
+
 ### Codex App
 
 Compound Engineering is not listed in Codex's built-in plugin marketplace yet. Add it as a custom marketplace:

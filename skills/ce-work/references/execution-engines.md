@@ -48,7 +48,7 @@ For a bare prompt, cross-model execution is eligible only after Phase 0 has esta
 ## Run the chosen engine
 
 - **Native:** follow `references/execution-strategy.md` for scheduling and dispatch, and the Phase 2 loop in `references/implementation-loop.md`. `ce-work` creates the tasks, orders the units, dispatches, verifies, and commits.
-- **Cross-model:** follow the serial external-unit transaction in `references/cross-model-execution.md` through the bundled controller, detached runner, and fixed adapter. Never let the detached worker select a fallback recipient.
+- **Cross-model:** follow the serial external-unit transaction in `references/cross-model-execution.md` through the bundled controller, detached runner, and fixed adapter. Never let the detached worker select a fallback recipient. Under T3 Code, follow that file's T3 Code route instead; T3 dispatches the worker and the controller does not run.
 
 ## Resume the correct tail
 

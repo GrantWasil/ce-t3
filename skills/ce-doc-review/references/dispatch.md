@@ -1,5 +1,7 @@
 # Dispatching the reviewers
 
+Under T3 Code, when `orchestrator_capabilities` and `delegate_task` are callable, read `references/t3-dispatch.md` before assigning a reviewer that needs T3. That adapter owns its transport and terminal collection, including checkpointed waits across turns; the native in-turn collector below applies only to native reviewers. Preserve the same selected roster, prompts, schemas, and finish stages.
+
 Dispatch generic subagents with **bounded parallelism** using the platform's subagent primitive (e.g., `Agent` in Claude Code, `spawn_agent` in Codex) where available; otherwise run the work inline or serially. Omit the `mode` parameter so the user's configured permission settings apply.
 
 A generic subagent is one whose whole brief is the prompt you send it. When the host's subagent tool makes you name an agent, use only a name you have seen the host list, and list its agents before the first dispatch if you have not. Pick the plain one that adds no role of its own, which still counts as a generic subagent. Never pick a specialist, such as a reviewer or worker agent, whose own role prompt, output format, or tool limits would replace or narrow your prompt.

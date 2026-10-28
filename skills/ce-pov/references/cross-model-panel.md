@@ -237,6 +237,52 @@ paths. Mention a cooperative scope restriction only when it materially changes
 the user's choice. Refer to the codebase as "this project" or "the repository"
 unless the user supplied a recognizable name.
 
+### T3 Code route
+
+When T3 Code's `orchestrator_capabilities` and `delegate_task` are callable,
+read `references/t3-dispatch.md` before resolving routes. T3 then carries every
+peer. Do not start `scripts/cross-model-pov.sh` as a worker, the job runner, or
+an acpx route, and do not fall back to them.
+
+Everything else in this protocol applies: Section 1's participants and host
+identity (attest the host family from T3's inherited provider under that file's
+identity rule), Section 2's scope, Section 3's hard boundaries on targets,
+recipients, announcement, and named peers that cannot run, Section 4's payload
+contract and artifact acceptance rules, and Sections 5 through 8. These parts
+change:
+
+- **Route.** Resolve each target to a T3 provider. A model the user named must
+  be served by that provider's catalog entry, or that voice is reported as not
+  run. With no model named, use the first model in the provider's default list,
+  and select an effort for a read-only judgment. Record each voice's target,
+  model, and effort.
+- **Dispatch.** Send one `delegate_task` per peer, all before waiting, with
+  `mode: async`, `isolation: shared`, and `role: review`. Each task gives the
+  absolute skill directory and says to read `references/agents/pov-peer.md` and
+  `references/pov-schema.json` from it; gives the round's payload path, the
+  repository root, the read root, and any include or exclude patterns; asks for
+  a read-only judgment with no edits and no other agents; and asks for one JSON
+  object in the POV schema shape, with `final` set as the schema requires,
+  written to `<scratch-dir>/pov-<target>.raw.json`, with that path as the
+  reply's last line. Record the task ids in `<run-dir>/t3-peers.json`.
+- **Collect.** Follow each task's `next` as that file directs. If the turn must
+  end before every peer is delivered, the checkpoint is `t3-peers.json` plus the
+  stages still owed: the remaining collection, Section 5's dissent check and any
+  reconcile round, Sections 6 and 8, and the return to any calling skill. For
+  each delivered peer, run `bash "$SKILL_DIR/scripts/cross-model-pov.sh"
+  --normalize-t3 <host-family> <driverKind> <providerInstanceId> <model>
+  <scratch-dir>/pov-<target>.raw.json <run-dir> <target>`. Exit 0 prints the published
+  `pov-<target>.json`; read it directly and apply the acceptance rules above.
+  Exit 3, or a task that ended in error, was cancelled, or wrote no file, is a
+  peer that did not answer; state the observed cause from the task's result. A
+  non-final answer gets one new task on the same target that requires a final
+  answer; if it recurs, drop the voice. Exit 2 is a dispatch-infrastructure
+  failure to report.
+- **Reconcile rounds** send new tasks to the same targets with Section 5's
+  payload.
+- **Cleanup** also removes `t3-peers.json`; `task_cancel` every peer still
+  running when the panel stops.
+
 ## 4. Dispatch, wait, reap, and collect
 
 Prepare one complete canonical payload containing the framed question, subject

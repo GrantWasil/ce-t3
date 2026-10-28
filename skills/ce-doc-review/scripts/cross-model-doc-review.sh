@@ -541,6 +541,71 @@ if [ "${1:-}" = "--emit-adapter" ]; then
   exit 0
 fi
 
+# --- normalize a peer's raw findings into the fold-in artifact ---------------
+# One owner for the published shape: the live route and --normalize-t3 both call
+# this, so a T3 Code child's findings fold in exactly like a CLI peer's.
+normalize_findings() {   # <raw> <out> <reviewer> <route> <target> <harness> <family> <independent> <mreq> <mact> <ereq>
+  jq --arg r "$3" --arg route "$4" --arg target "$5" --arg harness "$6" \
+     --arg family "$7" --argjson independent "$8" \
+     --arg mreq "$9" --arg mact "${10}" --arg ereq "${11}" \
+     'if (.findings|type)=="array"
+      then { reviewer: $r,
+             cross_model_route: $route,
+             cross_model_target: $target,
+             cross_model_harness: $harness,
+             serving_family: $family,
+             independence_verified: $independent,
+             model_requested: $mreq,
+             model_actual: $mact,
+             effort_requested: $ereq,
+             findings: [ .findings[] | if (.autofix_class? == "safe_auto") then .autofix_class = "gated_auto" else . end ],
+             residual_risks: (.residual_risks // []),
+             deferred_questions: (.deferred_questions // []) }
+      else empty end' \
+     "$1" > "$2" 2>/dev/null
+}
+
+# --- --normalize-t3: publish a T3 Code child's findings, no model call ------
+# Usage: --normalize-t3 <host-family> <driver-kind> <provider-instance-id>
+#                       <model-requested> <effort-requested> <reviewer-name>
+#                       <raw-json> <run-dir> <target>
+# Writes <run-dir>/<reviewer-name>-<target>.json and prints its path. T3 returns
+# no served-model receipt, so model_actual stays unverified. Serving family
+# comes from a first-party driver only; any other driver leaves it unknown,
+# which keeps independence_verified false. Exit 2: invalid input. Exit 3: the
+# raw output is not schema-shaped, and nothing is published.
+if [ "${1:-}" = "--normalize-t3" ]; then
+  command -v jq >/dev/null 2>&1 || { echo "jq not installed" >&2; exit 2; }
+  t3_host="${2:-}"; t3_driver="${3:-}"; t3_instance="${4:-}"; t3_mreq="${5:-}"; t3_ereq="${6:-}"; t3_reviewer="${7:-}"; t3_raw="${8:-}"; t3_dir="${9:-}"
+  case "$t3_host" in codex|claude|grok|composer|gemini|unknown) ;; *) echo "host serving family '$t3_host' invalid (want codex|claude|grok|composer|gemini|unknown)" >&2; exit 2 ;; esac
+  case "$t3_instance" in ''|*[!A-Za-z0-9._-]*) echo "provider instance id '$t3_instance' invalid" >&2; exit 2 ;; esac
+  case "$t3_reviewer" in security-lens|adversarial|product-lens|whole-doc) ;; *) echo "reviewer-name '$t3_reviewer' is not a cross-model reviewer (want security-lens|adversarial|product-lens|whole-doc)" >&2; exit 2 ;; esac
+  t3_target="${10:-}"
+  case "$t3_driver:$t3_target" in
+    codex:codex) t3_family=codex ;;
+    claudeAgent:claude) t3_family=claude ;;
+    grok:grok) t3_family=grok ;;
+    cursor:cursor|cursor:composer|cursor:grok|opencode:opencode|antigravity:antigravity) t3_family=unknown ;;
+    *) echo "target '$t3_target' is not served by driver '$t3_driver'" >&2; exit 2 ;;
+  esac
+  [ -n "$t3_mreq" ] && [ -n "$t3_ereq" ] || { echo "requested model and effort are required" >&2; exit 2; }
+  [ -f "$t3_raw" ] || { echo "raw output '$t3_raw' not found" >&2; exit 2; }
+  [ -d "$t3_dir" ] || { echo "run-dir '$t3_dir' is not a directory" >&2; exit 2; }
+  t3_independent=false
+  [ "$t3_host" != unknown ] && [ "$t3_family" != unknown ] && [ "$t3_host" != "$t3_family" ] && t3_independent=true
+  t3_out="$t3_dir/$t3_reviewer-$t3_target.json"
+  t3_tmp="$t3_out.tmp.$$"
+  t3_skill_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)" || exit 2
+  if normalize_findings "$t3_raw" "$t3_tmp" "$t3_reviewer-$t3_target" "t3:$t3_instance" "$t3_target" \
+       "t3:$t3_driver" "$t3_family" "$t3_independent" "$t3_mreq" unverified "$t3_ereq" &&
+     jq -e --slurpfile schema "$t3_skill_root/references/findings-schema.json" -f "$t3_skill_root/scripts/t3-findings-valid.jq" "$t3_tmp" >/dev/null 2>&1; then
+    mv "$t3_tmp" "$t3_out" && { echo "$t3_out"; exit 0; }
+  fi
+  rm -f "$t3_tmp"
+  echo "raw output has no schema-shaped findings; nothing published" >&2
+  exit 3
+fi
+
 HOST_PROVIDER="${1:-}"
 HOST_HARNESS="${CROSS_MODEL_HOST_HARNESS:-unknown}"
 CANDIDATES="${2:-}"
@@ -1198,26 +1263,9 @@ run_provider() {   # <provider>
     esac
     _independent=false
     [ "$HOST_PROVIDER" != "unknown" ] && [ "$_target_family" != "unknown" ] && [ "$HOST_PROVIDER" != "$_target_family" ] && _independent=true
-    if jq --arg r "$REVIEWER_NAME-$provider" --arg route "$ACTUAL_ROUTE" \
-         --arg target "$provider" --arg harness "$(route_harness "$ACTUAL_ROUTE")" \
-         --arg family "$_target_family" --argjson independent "$_independent" \
-         --arg mreq "$(route_model "$ACTUAL_ROUTE")" --arg mact "$MODEL_ACTUAL" \
-         --arg ereq "$(route_effort "$ACTUAL_ROUTE")" \
-         'if (.findings|type)=="array"
-          then { reviewer: $r,
-                 cross_model_route: $route,
-                 cross_model_target: $target,
-                 cross_model_harness: $harness,
-                 serving_family: $family,
-                 independence_verified: $independent,
-                 model_requested: $mreq,
-                 model_actual: $mact,
-                 effort_requested: $ereq,
-                 findings: [ .findings[] | if (.autofix_class? == "safe_auto") then .autofix_class = "gated_auto" else . end ],
-                 residual_risks: (.residual_risks // []),
-                 deferred_questions: (.deferred_questions // []) }
-          else empty end' \
-         "$RAW_OUT" > "$_norm" 2>/dev/null; then
+    if normalize_findings "$RAW_OUT" "$_norm" "$REVIEWER_NAME-$provider" "$ACTUAL_ROUTE" \
+         "$provider" "$(route_harness "$ACTUAL_ROUTE")" "$_target_family" "$_independent" \
+         "$(route_model "$ACTUAL_ROUTE")" "$MODEL_ACTUAL" "$(route_effort "$ACTUAL_ROUTE")"; then
       mv "$_norm" "$OUT"
     else
       rm -f "$_norm"
