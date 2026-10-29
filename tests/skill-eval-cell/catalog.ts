@@ -22,8 +22,8 @@ export const ISSUE_1482_BASE_REF = "66ccf579f8c1ef2ccfc642c317ba53151eeb1ebb"
 export const PR_OPENING_BASE_REF = "f6c301cafc888f965ffd99195eb5f95ac2c6d9a8"
 /** main before the right-size-ceremony change (#1513 release commit): the A/B base for its rows. */
 export const RIGHT_SIZE_BASE_REF = "925b4ef71cbee0b4205693c4cafc9b2c557a603a"
-/** main before CODING_STANDARDS.md became the designated criteria source: the A/B base for the standards-discovery rows. */
-export const STANDARDS_SOURCE_BASE_REF = "799702cf0f5405c9361548cd86490c5603e2632c"
+/** Main parent of the standards-source change (#1572); the former PR-only commit is absent in fresh clones. */
+export const STANDARDS_SOURCE_BASE_REF = "f76d3096a1c79484f171e9497b406e9c0e6f0bc6"
 /** main after #1514 merged: the product-lens activation leg still read "alternatives plausibly exist". */
 export const DOC_REVIEW_BASE_REF = "6f6c5779d31c0f847773e0cbc1e7e7fc7b11f272"
 /** main before Goal Capsule required a holdable goal, not only a user-checkable outcome. */

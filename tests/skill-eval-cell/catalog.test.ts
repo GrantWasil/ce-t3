@@ -78,11 +78,18 @@ describe("skill-eval-cell catalog", () => {
     expect(WAVE1.filter((id) => !ids.has(id))).toEqual([])
   })
 
-  test("every scenario skill exists at its runnable arm refs", () => {
+  test("every scenario skill exists at reachable runnable arm refs", () => {
     const missing: string[] = []
+    const checkedBaselines = new Set<string>()
     for (const scenario of SCENARIOS) {
       // A post-only row for a skill that did not exist at the sweep baseline has no pre arm to resolve.
       const preRef = scenario.baseline_ref ?? PRE_SWEEP_REF
+      if (!scenario.post_only && !checkedBaselines.has(preRef)) {
+        checkedBaselines.add(preRef)
+        if (spawnSync("git", ["merge-base", "--is-ancestor", preRef, "HEAD"], { cwd: REPO_ROOT }).status !== 0) {
+          missing.push(`baseline ${preRef} is not in the checkout history`)
+        }
+      }
       if (!scenario.post_only && !gitShowExists(preRef, scenario.skill)) {
         missing.push(`${scenario.skill} missing at ${preRef}`)
       }
