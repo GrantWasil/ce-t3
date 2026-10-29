@@ -146,6 +146,8 @@ The core loop is six steps: **brainstorm** the requirements, **plan** the implem
 
 Each cycle compounds. `/ce-compound` writes learnings that the next `/ce-brainstorm` and `/ce-plan` read as grounding. Brainstorms sharpen plans, plans inform future plans, reviews catch more issues, patterns get documented. That return arrow is the whole point.
 
+At each user-facing task boundary, CE recommends a next action, explains what it accomplishes, and gives a copyable continuation when work remains. The handoff says whether to stay in the current thread or open a new one in the same project. A blocked task names what would unblock it and how to resume. See [Next-step handoffs](docs/guides/next-steps.md) for the boundaries, including structured returns and output-only requests.
+
 <img src="assets/demo/compound-loop.gif" alt="A ce-compound run writes a learning about an env-var trap; 18 days later, on unrelated work, a ce-plan run finds that learning and carries its constraints into the new plan" width="100%">
 
 **Run one teaches it. Run two remembers.**

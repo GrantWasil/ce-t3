@@ -4,6 +4,7 @@ description: Run browser tests for pages affected by the current branch or PR. U
 argument-hint: "[PR number, branch name, 'current', or --port PORT]"
 ---
 
+For reports, read `references/next-steps.md`.
 # Browser Test Skill
 
 Run end-to-end browser tests on pages affected by a PR or branch using the best approved browser driver available in the active harness.

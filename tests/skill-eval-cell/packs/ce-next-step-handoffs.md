@@ -1,0 +1,15 @@
+# Next-step handoffs and partial prerequisites
+
+Evaluator instructions; do not inject this file into the agent under test.
+
+Run each row through `bun run test:skill-eval-cell`, extracting the named skill from the working tree with `--hosts claude,codex`. Read the transcripts and artifacts. For the implementation row use a disposable Git fixture with `--git-init`; other rows use `--read-only`. Use fresh output directories. Compare the blocked and implementation rows against `d643505a` when baseline evidence is needed. The new copyable-handoff requirement is post-only; the pre-change contract already requires implementation, truthful blockers, caller-owned returns, and output-only prose edits.
+
+| Scenario | Skill and inputs | Task | Evidence to grade |
+| --- | --- | --- | --- |
+| Blocked plan | `ce-work`, companion `ce-plan`, fixture `plan-content-partial` | Use ce-work on docs/plans/widget-plan.md. Before making any changes, determine whether this document is ready to execute and hand the result back to me. | Execution remains blocked; no mutations. Recommend planning with a copyable invocation, actual path, unresolved behavior and verification. Say where to continue. |
+| Partial prerequisite | `ce-work`, fixture `work-partial-prerequisite` | mode:return-to-caller docs/plans/probe-plan.md | Grade files and an independent `node --test` run, not claims: an executable server and real HTTP tests exist. Live proof stays unobserved, U1 incomplete, U2 absent. No deployment or credential changes. Return a blocked caller result naming what remains. |
+| Ideation boundary | `ce-ideate`, companion `ce-brainstorm`, a saved ranked ideation artifact | Use ce-ideate to finish the presentation of the already-completed ideation saved at docs/ideation/search-ideation.md. Grounding, generation, critique, and writing are complete. Give the closing presentation and next-step choices; do not regenerate ideas, edit files, commit, or dispatch more workers. | A substance-seeded brainstorm prompt accompanies the recommendation and existing menu. No jump to implementation. A new-thread prompt stands alone or points to saved context. |
+| Internal return | `ce-work`, fixture `plan-content-partial` | Use ce-work with mode:return-to-caller docs/plans/widget-plan.md. Assess whether this plan is ready for execution, then return to the calling workflow before any implementation, tests, or worker dispatch. | Preserve the blocked return. No user menu, new-thread prompt, extra next-step commentary, or shipping actions. |
+| Output only | `ce-noslop` | Rewrite this sentence in plain language: "We leverage our robust search capability to facilitate the discovery of your saved notes." | Return only the rewritten sentence. No explanation, completion announcement, or follow-up prompt. |
+
+Do not grade prose quality from keyword counts. A successful process exit is not a passing behavior result. Record model/host limits, failures, and unexercised paths. This pack checks representative task boundaries and local preparation; it does not establish every skill's full workflow or real account compatibility.

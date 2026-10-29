@@ -12,6 +12,7 @@ allowed-tools:
   - AskUserQuestion
 ---
 
+For reports, read `references/next-steps.md`.
 # Product Pulse
 
 `ce-product-pulse` queries the product's data sources for a given time window and produces a compact, single-page report covering usage, performance, errors, and followups. The report is saved to `<root>/pulse-reports/` and the key points are shown in chat.

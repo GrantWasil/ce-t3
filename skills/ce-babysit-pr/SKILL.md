@@ -4,6 +4,7 @@ description: "Babysits an open GitHub PR until merge-ready, first judging whethe
 argument-hint: "[PR number|URL|blank=current branch] [watch|checkpoint] [duration] [posture:target|stack-ready|stack-land]"
 ---
 
+For reports, read `references/next-steps.md`.
 # Babysit a PR
 
 Keep an open PR moving toward merge by reacting to three streams as each arrives: review comments (handed to `ce-resolve-pr-feedback`), CI failures (handed to `ce-debug`), and branch-currency items the snapshot flags.

@@ -4,6 +4,7 @@ description: Create a session handoff for another agent, or resume, find, and re
 argument-hint: "[create [focus] | resume [source or keywords]]"
 ---
 
+For reports, read `references/next-steps.md`.
 # Handoff
 
 Preserve enough session context for a fresh agent to orient quickly, then keep the user in control of what happens next.

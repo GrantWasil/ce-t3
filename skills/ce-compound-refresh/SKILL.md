@@ -4,6 +4,7 @@ description: Refresh the repo's captured learnings against the current codebase.
 argument-hint: "[optional: scope hint — directory, filename, module, or keyword] [mode:non-interactive] "
 ---
 
+For reports, read `references/next-steps.md`.
 # Compound Refresh
 
 Audit the learnings under `<root>/solutions/` against the current codebase, apply the maintenance actions the evidence supports, and deliver a complete per-doc report plus committed changes. The report and the corrected document set are the deliverables. The store only compounds value if every doc can be trusted.
@@ -77,7 +78,7 @@ Edits apply silently in every mode. The report's `CONCEPTS.md` line records what
 
 ## Report
 
-**Print the full report as markdown.** It is the deliverable, not an internal summary, and in non-interactive mode it is the only one. Keep it self-contained and never abbreviated, split into **Applied** and **Recommended**. **Read `references/report.md`** for the summary block, per-file detail, and what belongs under Recommended.
+Read `references/report.md` and print its full, self-contained markdown deliverable.
 
 ## Commit
 

@@ -8,6 +8,7 @@ allowed-tools:
   - WebFetch
 ---
 
+For reports, read `references/next-steps.md`.
 # Proof - Collaborative Markdown Editor
 
 Proof is a collaborative document editor for humans and agents. It is reached through the hosted web API at `https://www.proofeditor.ai`, over HTTP from `Bash`.

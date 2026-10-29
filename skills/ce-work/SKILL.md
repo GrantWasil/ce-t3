@@ -4,6 +4,7 @@ description: Execute a plan or concrete work prompt end-to-end. Use when impleme
 argument-hint: "[Plan path, work description, or recovery request with run id; blank uses latest] | [mode:return-to-caller [implementation_engine:<compact-json>] [implementation_run:<safe-id>] <plan path> for outer orchestrators]"
 ---
 
+For reports, read `references/next-steps.md`.
 # Work Execution Command
 
 ## Outcome

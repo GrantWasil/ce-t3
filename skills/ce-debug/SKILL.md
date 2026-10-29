@@ -4,6 +4,7 @@ description: "Diagnosis loop for bugs and failing behavior. Use when asked to de
 argument-hint: "[issue reference, error message, test path, or description of broken behavior]"
 ---
 
+For reports, read `references/next-steps.md`.
 # Debug and Fix
 
 Find the root cause of a failure, then — when the user chooses to — fix it with test-first discipline.

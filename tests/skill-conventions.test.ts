@@ -144,6 +144,24 @@ const REPO_ROOT = process.cwd()
 const SKILLS_ROOT = path.join(REPO_ROOT, "skills")
 const AGENTS_MD_REF = `AGENTS.md (repo root)`
 
+describe("task-boundary handoffs", () => {
+  const source = readFileSync(
+    path.join(SKILLS_ROOT, "ce-handoff/references/next-steps.md"),
+    "utf8",
+  )
+  const skills = readdirSync(SKILLS_ROOT).filter((name) =>
+    existsSync(path.join(SKILLS_ROOT, name, "SKILL.md")),
+  )
+
+  test.each(skills)("%s loads the self-contained handoff contract", (name) => {
+    const dir = path.join(SKILLS_ROOT, name)
+    const skill = readFileSync(path.join(dir, "SKILL.md"), "utf8")
+    expect(skill).toContain("For reports, read `references/next-steps.md`.")
+    // ce-handoff owns the common text; installed skills cannot read siblings.
+    expect(readFileSync(path.join(dir, "references/next-steps.md"), "utf8")).toBe(source)
+  })
+})
+
 describe("user-facing skill invocation authoring contract", () => {
   test("authoring guidance separates semantic routing from host-rendered user copy", () => {
     for (const text of [ROOT_AGENTS, PORTABLE_AUTHORING_GUIDE]) {

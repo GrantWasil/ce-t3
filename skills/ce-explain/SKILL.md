@@ -4,6 +4,7 @@ description: "Explain how and why something has its current shape, or what happe
 argument-hint: "[question, concept, change, or work window] [intended use or reader]"
 ---
 
+For reports, read `references/next-steps.md`.
 # Explain How and Why
 
 Produce an explanation that answers the scoped question and gives its consumer enough understanding for the intended use. The subject and purpose come from the request and available context, whether a person or another workflow supplied them. Ground project behavior in source evidence; distinguish documented rationale, inference, and unknowns.

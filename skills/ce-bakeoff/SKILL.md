@@ -3,6 +3,7 @@ name: ce-bakeoff
 description: "Develop independent competing solutions to a defined brief, compare them, and synthesize a winning approach. Use when choosing well requires developing alternatives beyond their current form. Use ce-pov to judge developed material and ce-ideate to discover opportunities."
 ---
 
+For reports, read `references/next-steps.md`.
 # Bake-off
 
 Develop concrete competing solutions and return the strongest coherent approach to the user or calling skill. You do the generation, comparison, selection, synthesis, and verification. The caller decides adoption and does the subsequent work. Done means at least two usable independent candidates received an independent assessment, the coordinator reconciled it with its own comparison, the final artifact was verified against evidence and the brief, and the complete decision reached its consumer; otherwise return an explicit incomplete or unresolved result. The purpose is exploration before commitment, not a larger option count.

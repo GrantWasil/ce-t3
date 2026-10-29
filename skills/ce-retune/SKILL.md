@@ -5,6 +5,7 @@ disable-model-invocation: true
 argument-hint: "[target model or symptom] [path to the corpus, defaults to ./skills] [bar:<n> consecutive clean runs]"
 ---
 
+For reports, read `references/next-steps.md`.
 # Retune a Corpus for a New Model
 
 A corpus that degrades on a new model is a measurement problem before it is a writing problem: rewriting what looks wrong produces a plausible fix list and no way to know whether any item mattered.
