@@ -1,8 +1,9 @@
 import { afterAll, describe, expect, test } from "bun:test"
 import { spawn, spawnSync } from "node:child_process"
-import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs"
+import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs"
 import { tmpdir } from "node:os"
 import path from "node:path"
+import { load } from "js-yaml"
 import { junitCases, lostExitMs, lostExitZombies, parsePs, passTimeoutMs, passthroughArgs, rerunCandidates } from "../scripts/run-tests"
 import { alive, survivors } from "./helpers/process"
 
@@ -429,6 +430,51 @@ test("times out, then fails", async () => {
   }, 90_000)
 })
 
+describe("run-tests: Bun toolchain", () => {
+  test("package metadata pins an exact Bun version", () => {
+    const pkg = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8"))
+    expect(pkg.packageManager).toMatch(/^bun@\d+\.\d+\.\d+$/)
+  })
+
+  test("CI reads the package pin for every Bun setup", () => {
+    const workflows = new URL("../.github/workflows/", import.meta.url)
+    let setups = 0
+    for (const file of readdirSync(workflows).filter((file) => /\.ya?ml$/.test(file))) {
+      const workflow = load(readFileSync(new URL(file, workflows), "utf8")) as {
+        jobs: Record<string, { steps?: { uses?: string; with?: Record<string, string> }[] }>
+      }
+      for (const job of Object.values(workflow.jobs)) {
+        for (const step of job.steps ?? []) {
+          if (!step.uses?.startsWith("oven-sh/setup-bun@")) continue
+          setups++
+          expect(step.with?.["bun-version-file"]).toBe("package.json")
+          expect(step.with?.["bun-version"]).toBeUndefined()
+        }
+      }
+    }
+    expect(setups).toBeGreaterThan(0)
+  })
+
+  test("a mismatched Bun version fails before spawning any tests", () => {
+    const repo = fixture(`import { test } from "bun:test"\nimport { writeFileSync } from "node:fs"\ntest("ran", () => writeFileSync("ran", ""))\n`)
+    mkdirSync(path.join(repo, "scripts"))
+    copyFileSync(RUNNER, path.join(repo, "scripts", "run-tests.ts"))
+    writeFileSync(path.join(repo, "package.json"), JSON.stringify({ packageManager: "bun@0.0.0" }))
+    const r = spawnSync(process.execPath, [path.join(repo, "scripts", "run-tests.ts"), "./fixture.test.ts"], {
+      cwd: repo,
+      encoding: "utf8",
+      env: { PATH: process.env.PATH ?? "", HOME: repo },
+      timeout: 30_000,
+    })
+    expect(r.status).toBe(1)
+    expect(r.stderr).toContain("bun@0.0.0")
+    expect(r.stderr).toContain(`bun@${Bun.version}`)
+    expect(r.stderr).toContain("package.json")
+    expect(r.stderr).not.toContain(RECAP)
+    expect(existsSync(path.join(repo, "ran"))).toBe(false)
+  }, 60_000)
+})
+
 describe("run-tests: dependency preflight", () => {
   test("a declared dependency missing from node_modules fails fast, naming it and bun install", () => {
     const repo = fixture(`import { test } from "bun:test"\nimport { writeFileSync } from "node:fs"\ntest("ran", () => writeFileSync("ran", ""))\n`)
@@ -436,7 +482,7 @@ describe("run-tests: dependency preflight", () => {
     copyFileSync(RUNNER, path.join(repo, "scripts", "run-tests.ts"))
     writeFileSync(
       path.join(repo, "package.json"),
-      JSON.stringify({ dependencies: { present: "1" }, devDependencies: { "@scope/absent": "1", "plain-absent": "1" } }),
+      JSON.stringify({ packageManager: `bun@${Bun.version}`, dependencies: { present: "1" }, devDependencies: { "@scope/absent": "1", "plain-absent": "1" } }),
     )
     mkdirSync(path.join(repo, "node_modules", "present"), { recursive: true })
     writeFileSync(path.join(repo, "node_modules", "present", "package.json"), "{}")

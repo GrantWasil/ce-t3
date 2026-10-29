@@ -10,8 +10,10 @@ It also contains:
 
 ## Quick Start
 
+Use the exact Bun version in `package.json`'s `packageManager` field. CI reads that same pin; the test runner rejects other versions before starting tests. See README.md "Repository development" for a temporary toolchain command that leaves the global Bun installation alone.
+
 ```bash
-bun install
+bun install --frozen-lockfile
 bun run test              # full test suite (also runs in CI; `--parallel` across worker processes)
 bun run typecheck         # tsc over src, scripts, and tests (also runs in CI)
 bun run release:validate  # plugin/marketplace consistency (also runs in CI)

@@ -47,7 +47,7 @@ jobs:
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version: latest
+          bun-version-file: package.json
 
       # Pinned to the compound-cli commit that shipped `compound audit` (PR #21).
       # Switch to `bunx compound-cli@<version> audit` once the package is published
@@ -79,10 +79,10 @@ jobs:
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version: latest
+          bun-version-file: package.json
 
       - name: Install dependencies
-        run: bun install
+        run: bun install --frozen-lockfile
 
       - name: Validate release metadata
         run: bun run release:validate
@@ -158,10 +158,10 @@ jobs:
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version: latest
+          bun-version-file: package.json
 
       - name: Install dependencies
-        run: bun install
+        run: bun install --frozen-lockfile
 
       - name: acpx contract suite
         run: bun run test:acpx-contract
@@ -201,10 +201,10 @@ jobs:
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version: latest
+          bun-version-file: package.json
 
       - name: Install dependencies
-        run: bun install
+        run: bun install --frozen-lockfile
 
       - name: Peer-job-runner unit fixture
         # Use `python`, never `python3` — on Windows the latter is often the
@@ -327,10 +327,10 @@ jobs:
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version: latest
+          bun-version-file: package.json
 
       - name: Install dependencies
-        run: bun install
+        run: bun install --frozen-lockfile
 
       # bun exits 0 when the named test is skipped, so the summary must show it ran.
       # An explicit `shell: bash` adds pipefail, so bun's exit status survives `| tee`.

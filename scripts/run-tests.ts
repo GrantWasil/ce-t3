@@ -286,6 +286,15 @@ function runPass(args: string[], limitMs: number | null, lostMs: number): Promis
 }
 
 async function main(argv: string[]): Promise<number> {
+  const { packageManager } = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8"))
+  if (typeof packageManager !== "string" || !/^bun@\d+\.\d+\.\d+$/.test(packageManager)) {
+    console.error("package.json must declare an exact Bun version in packageManager (bun@x.y.z).")
+    return 1
+  }
+  if (packageManager !== `bun@${Bun.version}`) {
+    console.error(`Tests require ${packageManager} from package.json; running bun@${Bun.version}. Select the pinned Bun version before retrying (see README.md, Repository development).`)
+    return 1
+  }
   const missing = missingDependencies()
   if (missing.length > 0) {
     console.error(`Missing dependencies: ${missing.join(", ")}. Run \`bun install\`, then re-run the tests.`)

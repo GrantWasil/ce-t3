@@ -418,6 +418,19 @@ Compound Engineering moved to a root-native, skills-only layout. If you installe
 
 See **[docs/install/upgrading.md](docs/install/upgrading.md)** for the per-host refresh commands, and for removing the obsolete Codex tool-map block left behind by pre-native Bun installs.
 
+## Repository development
+
+Use the exact Bun version in [`package.json`](package.json)'s `packageManager` field. CI installs that version and uses the committed lockfile; `bun run test` checks the version before starting the suite. To select the same toolchain temporarily without replacing a global Bun installation, run these commands from the checkout (requires Node.js/npm):
+
+```bash
+CE_BUN_PACKAGE="$(node -p 'require("./package.json").packageManager')"
+npx --yes --package "$CE_BUN_PACKAGE" -- bun install --frozen-lockfile
+npx --yes --package "$CE_BUN_PACKAGE" -- bun run test
+npx --yes --package "$CE_BUN_PACKAGE" -- bun run typecheck
+```
+
+With the pinned Bun already on `PATH`, use the ordinary `bun` commands. Bump the package pin deliberately after validating the full suite on the new runtime.
+
 ## Limitations
 
 OpenCode, Pi, and oh-my-pi (omp) use native package/plugin loading from this repository. The Bun CLI remains for repository development and converter maintenance, not normal installation.
