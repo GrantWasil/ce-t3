@@ -6,7 +6,7 @@
 
 **AI skills that make each unit of engineering work easier than the last.**
 
-[![Build Status](https://github.com/EveryInc/compound-engineering-plugin/actions/workflows/ci.yml/badge.svg)](https://github.com/EveryInc/compound-engineering-plugin/actions/workflows/ci.yml)
+[![Build Status](https://github.com/GrantWasil/ce-t3/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/GrantWasil/ce-t3/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-black.svg)](LICENSE)
 [![Skills](https://img.shields.io/badge/skills-36-black.svg)](docs/guides/README.md)
 
@@ -21,6 +21,8 @@ Maintained by [Kieran Klaassen](https://github.com/kieranklaassen) and [Trevin C
 For understanding before a change, ask `ce-explain` how the relevant behavior works and why it exists. For a recommendation, use `ce-pov`; “oracle this” adds independent model opinions. Both can contribute to another workflow without a separate human interaction.
 
 ## Install
+
+**Using T3 Code?** Follow [Install this T3 fork](docs/install/t3.md) for Claude or Codex. It installs `GrantWasil/ce-t3`, which includes the T3 dispatch adapter. The other host instructions below install upstream Compound Engineering.
 
 ### Claude Code
 
@@ -58,7 +60,7 @@ Or search for "compound engineering" in the Cursor plugin marketplace. Do not ru
 
 Use Compound Engineering through your Claude or Codex host in T3 Code. When T3's orchestration tools are available, model elevation, cross-model reviews, and external implementation workers use T3-managed tasks. Session-model work keeps CE's existing policy; model preferences are configurable and reasoning effort is chosen per task unless pinned. See [T3 configuration and behavior](docs/guides/configuration.md#under-t3-code).
 
-For live development of this fork with Codex, run `bun run codex:dev -- local` from this checkout and start a new session. This links the checkout's current skills; a marketplace installation uses a cached snapshot.
+Use the [fork installation and update guide](docs/install/t3.md) to select the correct marketplace source. It also covers live checkout development with Codex.
 
 ### Codex App
 
@@ -415,6 +417,19 @@ See [`.agy/INSTALL.md`](.agy/INSTALL.md) for pinning, local development, uninsta
 Compound Engineering moved to a root-native, skills-only layout. If you installed before that move, refresh the cached marketplace **before** updating the plugin — order matters, and `/plugin update` alone keeps you on the old version.
 
 See **[docs/install/upgrading.md](docs/install/upgrading.md)** for the per-host refresh commands, and for removing the obsolete Codex tool-map block left behind by pre-native Bun installs.
+
+## Repository development
+
+Use the exact Bun version in [`package.json`](package.json)'s `packageManager` field. CI installs that version and uses the committed lockfile; `bun run test` checks the version before starting the suite. To select the same toolchain temporarily without replacing a global Bun installation, run these commands from the checkout (requires Node.js/npm):
+
+```bash
+CE_BUN_PACKAGE="$(node -p 'require("./package.json").packageManager')"
+npx --yes --package "$CE_BUN_PACKAGE" -- bun install --frozen-lockfile
+npx --yes --package "$CE_BUN_PACKAGE" -- bun run test
+npx --yes --package "$CE_BUN_PACKAGE" -- bun run typecheck
+```
+
+With the pinned Bun already on `PATH`, use the ordinary `bun` commands. Bump the package pin deliberately after validating the full suite on the new runtime.
 
 ## Limitations
 

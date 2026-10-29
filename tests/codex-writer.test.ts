@@ -70,6 +70,41 @@ function historicalAgentDescription(name: string): string {
 }
 
 describe("writeCodexBundle", () => {
+  test.each(["{ invalid JSON", "null", "[]", '"not an object"'])(
+    "preserves invalid existing hooks %j before changing the install",
+    async (content) => {
+      const root = await fs.mkdtemp(path.join(os.tmpdir(), "codex-invalid-hooks-"))
+      try {
+        const hooksPath = path.join(root, "hooks.json")
+        await fs.writeFile(hooksPath, content)
+        await expect(writeCodexBundle(root, {
+          pluginName: "sample",
+          prompts: [{ name: "valid", content: "must not be written" }],
+          skillDirs: [],
+          generatedSkills: [],
+          hooks: { hooks: { SessionStart: [{ hooks: [{ type: "command", command: "echo hello" }] }] } },
+        }, { outputIsCodexRoot: true })).rejects.toThrow("Cannot read existing Codex hooks")
+        expect(await fs.readFile(hooksPath, "utf8")).toBe(content)
+        expect(await fs.readdir(root)).toEqual(["hooks.json"])
+      } finally {
+        await fs.rm(root, { recursive: true, force: true })
+      }
+    },
+  )
+
+  test("does not treat a hooks read error as a missing file", async () => {
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), "codex-unreadable-hooks-"))
+    try {
+      await fs.mkdir(path.join(root, "hooks.json"))
+      await expect(writeCodexBundle(root, {
+        pluginName: "sample", prompts: [], skillDirs: [], generatedSkills: [],
+      }, { outputIsCodexRoot: true })).rejects.toThrow("Cannot read existing Codex hooks")
+      expect(await fs.readdir(root)).toEqual(["hooks.json"])
+    } finally {
+      await fs.rm(root, { recursive: true, force: true })
+    }
+  })
+
   test("writes prompts, skills, and config", async () => {
     const tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), "codex-test-"))
     const bundle: CodexBundle = {

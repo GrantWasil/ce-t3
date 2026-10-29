@@ -13,7 +13,7 @@ export type ManagedInstallManifest = {
 }
 
 export function sanitizeManagedPluginName(name: string): string {
-  return sanitizePathName(name).replace(/[\\/]/g, "-")
+  return sanitizePathName(name)
 }
 
 /**

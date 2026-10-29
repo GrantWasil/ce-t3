@@ -543,7 +543,8 @@ if [ "${1:-}" = "--normalize-t3" ]; then
   [ "$t3_host" != unknown ] && [ "$t3_family" != unknown ] && [ "$t3_host" != "$t3_family" ] && t3_independent=true
   t3_out="$t3_dir/pov-$t3_target.json"
   t3_tmp="$t3_out.tmp.$$"
-  if (umask 077; normalize_pov "$t3_raw" "$t3_tmp" "peer-$t3_target" "t3:$t3_instance" "$t3_target" \
+  if jq -se 'length == 1 and (.[0] | type == "object")' "$t3_raw" >/dev/null 2>&1 &&
+     (umask 077; normalize_pov "$t3_raw" "$t3_tmp" "peer-$t3_target" "t3:$t3_instance" "$t3_target" \
        "t3:$t3_driver" "$t3_family" "$t3_mreq" unverified "$t3_independent") && [ -s "$t3_tmp" ]; then
     mv "$t3_tmp" "$t3_out" && chmod 600 "$t3_out" && { echo "$t3_out"; exit 0; }
   fi
