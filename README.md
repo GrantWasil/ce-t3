@@ -6,7 +6,7 @@
 
 **AI skills that make each unit of engineering work easier than the last.**
 
-[![Build Status](https://github.com/EveryInc/compound-engineering-plugin/actions/workflows/ci.yml/badge.svg)](https://github.com/EveryInc/compound-engineering-plugin/actions/workflows/ci.yml)
+[![Build Status](https://github.com/GrantWasil/ce-t3/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/GrantWasil/ce-t3/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-black.svg)](LICENSE)
 [![Skills](https://img.shields.io/badge/skills-36-black.svg)](docs/guides/README.md)
 
