@@ -612,7 +612,8 @@ if [ "${1:-}" = "--normalize-t3" ]; then
   t3_out="$t3_dir/adversarial-$t3_target.json"
   t3_tmp="$t3_out.tmp.$$"
   t3_skill_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)" || exit 2
-  if normalize_findings "$t3_raw" "$t3_tmp" "adversarial-$t3_target" "t3:$t3_instance" "$t3_target" \
+  if jq -se 'length == 1 and (.[0] | type == "object")' "$t3_raw" >/dev/null 2>&1 &&
+     normalize_findings "$t3_raw" "$t3_tmp" "adversarial-$t3_target" "t3:$t3_instance" "$t3_target" \
        "t3:$t3_driver" "$t3_family" "$t3_independent" "$t3_mreq" unverified "$t3_ereq" false &&
      jq -e --slurpfile schema "$t3_skill_root/references/findings-schema.json" -f "$t3_skill_root/scripts/t3-findings-valid.jq" "$t3_tmp" >/dev/null 2>&1; then
     mv "$t3_tmp" "$t3_out" && { echo "$t3_out"; exit 0; }

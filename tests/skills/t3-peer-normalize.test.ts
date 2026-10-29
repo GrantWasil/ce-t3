@@ -83,9 +83,13 @@ const PEERS: Record<string, Peer> = {
 }
 
 function publish(peer: Peer, host: string, driver: string, raw: object) {
+  return publishRaw(peer, host, driver, JSON.stringify(raw))
+}
+
+function publishRaw(peer: Peer, host: string, driver: string, raw: string) {
   const dir = temp()
   const rawPath = path.join(dir, "raw.json")
-  writeFileSync(rawPath, JSON.stringify(raw))
+  writeFileSync(rawPath, raw)
   const out = path.join(dir, "out")
   mkdirSync(out)
   return { r: run(peer.script, peer.args(host, driver, rawPath, out)), out }
@@ -128,6 +132,22 @@ describe("--normalize-t3", () => {
     const peer = PEERS[name]
     const { r, out } = publish(peer, "claude", "codex", { unexpected: true })
     expect(r.status).toBe(3)
+    expect(readdirSync(out)).toEqual([])
+  })
+
+  const streams = Object.entries(PEERS).flatMap(([name, peer]) => {
+    const valid = JSON.stringify(peer.raw)
+    return [
+      { name, peer, kind: "empty", raw: " \n" },
+      { name, peer, kind: "two valid values", raw: `${valid}\n${valid}` },
+      { name, peer, kind: "invalid then valid", raw: `{}\n${valid}` },
+      { name, peer, kind: "valid then invalid", raw: `${valid}\n{}` },
+    ]
+  })
+  test.each(streams)("$name: rejects $kind without publishing", ({ peer, raw }) => {
+    const { r, out } = publishRaw(peer, "claude", "codex", raw)
+    expect(r.status).toBe(3)
+    expect(r.stdout).toBe("")
     expect(readdirSync(out)).toEqual([])
   })
 
