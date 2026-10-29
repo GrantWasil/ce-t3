@@ -4,6 +4,8 @@ Per-host instructions for refreshing Compound Engineering when you installed it 
 
 For a first-time install, see the [README](../../README.md#install).
 
+For the T3 fork, use [Install and update this T3 fork](t3.md). The fork and upstream share a marketplace name, so refreshing an upstream source does not switch it to the fork.
+
 ---
 
 ## Refresh the marketplace, then update the plugin

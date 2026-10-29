@@ -22,6 +22,8 @@ For understanding before a change, ask `ce-explain` how the relevant behavior wo
 
 ## Install
 
+**Using T3 Code?** Follow [Install this T3 fork](docs/install/t3.md) for Claude or Codex. It installs `GrantWasil/ce-t3`, which includes the T3 dispatch adapter. The other host instructions below install upstream Compound Engineering.
+
 ### Claude Code
 
 ```text
@@ -58,7 +60,7 @@ Or search for "compound engineering" in the Cursor plugin marketplace. Do not ru
 
 Use Compound Engineering through your Claude or Codex host in T3 Code. When T3's orchestration tools are available, model elevation, cross-model reviews, and external implementation workers use T3-managed tasks. Session-model work keeps CE's existing policy; model preferences are configurable and reasoning effort is chosen per task unless pinned. See [T3 configuration and behavior](docs/guides/configuration.md#under-t3-code).
 
-For live development of this fork with Codex, run `bun run codex:dev -- local` from this checkout and start a new session. This links the checkout's current skills; a marketplace installation uses a cached snapshot.
+Use the [fork installation and update guide](docs/install/t3.md) to select the correct marketplace source. It also covers live checkout development with Codex.
 
 ### Codex App
 
