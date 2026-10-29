@@ -53,6 +53,8 @@ export async function writeCodexBundle(
     ...(bundle.externallyManagedSkillNames ?? []).map((name) => sanitizePathName(name)),
   ]))
   assertNoCodexAgentFilenameCollisions(agents)
+  const hooksPath = path.join(codexRoot, "hooks.json")
+  const existingHooks = pluginName ? await readCodexHooks(hooksPath) : null
   await ensureDir(codexRoot)
   const manifest = pluginName ? await readInstallManifest(codexRoot, pluginName) : null
 
@@ -213,8 +215,6 @@ export async function writeCodexBundle(
   // Always run the merge (even with empty hooks) so previously installed
   // managed entries are cleaned up on upgrade.
   if (pluginName) {
-    const hooksPath = path.join(codexRoot, "hooks.json")
-    const existingHooks = await readJsonSafe(hooksPath)
     const pluginHooks = bundle.hooks?.hooks ?? {}
     const mergedHooks = mergeCodexHooks(existingHooks, pluginHooks, pluginName)
     const mergedContent = JSON.stringify(mergedHooks, null, 2) + "\n"
@@ -793,12 +793,19 @@ function formatTomlInlineTable(entries: Record<string, string>): string {
 
 // ── Hooks ──────────────────────────────────────────────────
 
-async function readJsonSafe(filePath: string): Promise<Record<string, unknown> | null> {
+function isJsonObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value)
+}
+
+async function readCodexHooks(filePath: string): Promise<Record<string, unknown> | null> {
   try {
     const content = await fs.readFile(filePath, "utf8")
-    return JSON.parse(content)
-  } catch {
-    return null
+    const parsed: unknown = JSON.parse(content)
+    if (!isJsonObject(parsed)) throw new Error("Expected a JSON object")
+    return parsed
+  } catch (error) {
+    if (error instanceof Error && "code" in error && error.code === "ENOENT") return null
+    throw new Error(`Cannot read existing Codex hooks at ${filePath}; refusing to modify the install`, { cause: error })
   }
 }
 
