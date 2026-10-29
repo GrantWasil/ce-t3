@@ -5,6 +5,7 @@ argument-hint: "[mode:pipeline | mode:return-to-caller | mode:resume] [PR number
 allowed-tools: Bash(gh *), Bash(git *), Bash(bash *), Bash(python3 *), Read, Write
 ---
 
+For reports, read `references/next-steps.md`.
 # Resolve PR Review Feedback
 
 Judge fresh PR review feedback centrally, then dispatch generic subagents seeded with the bundled fixer prompt only for approved fixes. Publish the fixes before replying and resolving. Resume completes saved judgments without another fix pass.

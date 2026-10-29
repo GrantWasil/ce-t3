@@ -4,6 +4,7 @@ description: "Rewrite, check, or draft prose so it carries no AI writing tells, 
 argument-hint: "[mode:author|edit|detect] [text, file path, or nothing]"
 ---
 
+For reports, read `references/next-steps.md`.
 # Write without slop
 
 Prose that carries no AI tells and that a reader understands on the first read, with every fact the source stated still there. Both goals hold at once: text that is free of tells but still dense has failed, and text that is plain but changes how certain a claim is has failed.

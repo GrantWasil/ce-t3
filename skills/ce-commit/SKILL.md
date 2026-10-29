@@ -3,6 +3,7 @@ name: ce-commit
 description: Create a git commit with a clear, value-communicating message. Use when the user asks to commit/save staged or unstaged changes with a repo-appropriate message.
 ---
 
+For reports, read `references/next-steps.md`.
 # Git Commit
 
 Create well-crafted local commit(s) from the current working tree. No push, no PR — use `ce-commit-push-pr` for the full ship flow.

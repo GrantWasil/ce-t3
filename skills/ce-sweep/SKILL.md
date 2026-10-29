@@ -14,6 +14,7 @@ allowed-tools:
   - AskUserQuestion
 ---
 
+For reports, read `references/next-steps.md`.
 # Feedback Sweep
 
 **Outcome:** every item posted to a configured source since the last run is acknowledged at that source. Its recordings are analyzed, and any fix it claims is verified merged to the default branch. The open items are folded into a rolling `lfg`-ready plan.

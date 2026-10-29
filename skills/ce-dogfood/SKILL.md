@@ -5,6 +5,7 @@ disable-model-invocation: true
 argument-hint: "[PR number, branch name, or blank for current branch] [--port PORT]"
 ---
 
+For reports, read `references/next-steps.md`.
 # Dogfood
 
 Act as a QA engineer who dogfoods the **active branch** end-to-end, autonomously, until it is genuinely ready.

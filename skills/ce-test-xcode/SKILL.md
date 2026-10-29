@@ -5,6 +5,7 @@ argument-hint: "[scheme name or 'current' to use default]"
 disable-model-invocation: true
 ---
 
+For reports, read `references/next-steps.md`.
 # Xcode Simulator Test
 
 Build and exercise an iOS app on a simulator, preserving screenshots, logs, human-verification results, and failures as evidence for the user.

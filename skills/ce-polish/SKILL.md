@@ -5,6 +5,7 @@ disable-model-invocation: true
 argument-hint: "[PR number, branch name, or blank for current branch]"
 ---
 
+For reports, read `references/next-steps.md`.
 # Polish
 
 Put a working feature in front of the user and turn their live observations into focused UX fixes on the running page. Two ways to collect those observations: **traditional**, where the user types what could be better; and **live**, where they talk and draw on the page while a voice interviewer turns speech into units and you act on them at checkpoints.

@@ -4,6 +4,7 @@ description: Build a throwaway prototype to answer how something should work, fe
 argument-hint: "[prompt, brainstorm path, or plan path]"
 ---
 
+For reports, read `references/next-steps.md`.
 # Prototype
 
 Build a throwaway prototype at the fidelity that can answer this question, before committing an approach later work will treat as given. Then apply the decisions or hand off.

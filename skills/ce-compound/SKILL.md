@@ -4,13 +4,14 @@ description: Document a solved problem as a durable repo learning. Use when veri
 argument-hint: "[optional: brief context] [mode:non-interactive] [depth:lightweight|full]"
 ---
 
+For reports, read `references/next-steps.md`.
 # /ce-compound
 
 **Outcome:** one qualifying solved problem is written as a durable learning under `<root>/solutions/`, grounded against the current tree, discoverable by the next agent.
 
 **Done:** a qualifying doc is written or updated, its frontmatter and claims validated, vocabulary capture recorded, and the mode's completion report emitted; when no learning qualifies, nothing is written and the report says why.
 
-**One learning per run.** A session that produced several gets several sequential runs, never one batched run. Read `references/research.md`; it explains what batching breaks.
+**One learning per run.** A session that produced several gets several sequential runs, never one batched run.
 
 
 ## Preconditions

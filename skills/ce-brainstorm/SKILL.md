@@ -4,6 +4,7 @@ description: "Explore vague or ambitious ideas into a right-sized requirements-o
 argument-hint: "[feature idea or problem to explore] [output:html]"
 ---
 
+For reports, read `references/next-steps.md`.
 # Brainstorm a Feature or Improvement
 
 Brainstorming answers **WHAT** to build through dialogue; `ce-plan` then enriches the same unified plan artifact with **HOW**. This skill does not implement code.

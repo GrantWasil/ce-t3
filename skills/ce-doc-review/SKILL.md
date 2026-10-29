@@ -4,6 +4,7 @@ description: Review requirements, plans, or specs with role-specific lenses. Use
 argument-hint: "[mode:non-interactive] [path/to/document.{md,html}]"
 ---
 
+For reports, read `references/next-steps.md`.
 # Document Review
 
 Help the author finish a sound document they can use to carry out the agreed work. Find problems that would change that work's outcome or materially hinder execution, and resolve them within the authority already given. Judge the document by whether it guides correct work, not by how much detail it contains. Serious consequences warrant attention even when the defect is small. An adequate document needs no changes.

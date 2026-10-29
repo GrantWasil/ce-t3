@@ -4,6 +4,7 @@ description: "Optimize a named target with a measured loop: attribute a workload
 argument-hint: "[path to optimization spec YAML, or describe the optimization goal]"
 ---
 
+For reports, read `references/next-steps.md`.
 # Optimize a measurable target
 
 **Outcome:** confirmed improvements to the named target live on an `optimize/<spec-name>` branch, with a disk log. The user takes over at wrap-up.
@@ -24,7 +25,7 @@ A step is done only after it ran. Describing a measurement, dispatch, or checkpo
 
 ## Interaction Method
 
-Use the host's blocking question tool already in the current tool list (match by capability, not by a host-specific name). Presence in the current tool list is proof the tool exists; never call a user-facing question tool to discover whether it exists. If a matching tool is listed but unloaded, use the host's tool-discovery primitive to load that capability: do not search for another host's tool name. Fall back to numbered options on the host's chat surface only when no such tool is in the list or a real question call errors. Never skip the question silently.
+Before asking the user a question, read `references/questions.md`.
 
 ## Execution Surface
 

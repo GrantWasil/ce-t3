@@ -5,6 +5,7 @@ argument-hint: "[feature, focus area, or constraint] [output:md]"
 
 ---
 
+For reports, read `references/next-steps.md`.
 # Generate Improvement Ideas
 
 `ce-ideate` runs before `ce-brainstorm`. This skill answers "which ideas are worth exploring?" `ce-brainstorm` then answers what one chosen idea should mean. `ce-plan` answers how it gets built.

@@ -4,6 +4,7 @@ description: "Create or update STRATEGY.md. Use when starting a product, adding 
 argument-hint: "[optional: section to revisit, e.g. 'metrics' or 'approach']"
 ---
 
+For reports, read `references/next-steps.md`.
 # Product Strategy
 
 `ce-strategy` writes and maintains its part of `STRATEGY.md` - the repo-root project document that captures what the project is, who it serves, how it succeeds, and where the team is investing. The file is shared with other tools and people; this skill writes only the sections `references/strategy-template.md` names. Downstream skills read it when it exists: `ce-ideate`, `ce-brainstorm`, and `ce-plan` for what work is on-strategy; `ce-product-pulse` for the product name and key metrics; `ce-dogfood` for the primary persona. Its frontmatter keys and this skill's section headings are the contract those skills parse - keep them for every section this skill authors; a meaning an existing section already carries is merged into it (`references/update-run.md`).

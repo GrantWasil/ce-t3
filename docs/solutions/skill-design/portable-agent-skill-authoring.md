@@ -178,6 +178,8 @@ Keep agent-to-agent routing capability-first: format formal skill names as inlin
 
 An authoring guide cannot supply runtime behavior to an installed skill. Put the smallest self-contained rendering rule immediately before the smallest section that contains all affected user-copy seams. Do not repeat it in every step; repeat it only in a separately loaded reference that independently owns output. Use a focused contract test when independently edited skills must preserve the same handoff, without duplicating the rationale or a harness matrix.
 
+At a user-facing task boundary, the next consumer needs an actionable continuation from the actual result, including a blocked result. Name the recommended action and its purpose, and supply a copyable prompt when work remains. A new-thread prompt carries its own context or references a saved handoff. Preserve internal return formats and output-only contracts; the outer workflow owns the user's next-step guidance. CE skills carry this shared contract in their own `references/next-steps.md` copies, with parity enforced by the skill-convention guard.
+
 ## Separate protocol from judgment
 
 For each prescriptive block, ask:

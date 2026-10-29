@@ -3,6 +3,7 @@ name: ce-riffrec-feedback-analysis
 description: "Analyze recorded product feedback into evidence for bugs and requirements. Use when a Riffrec capture or other screen, voice, or notes artifact needs interpretation. Use for Riffrec setup, capture, or sharing help when no recording exists yet."
 ---
 
+For reports, read `references/next-steps.md`.
 # Riffrec Feedback Analysis
 
 Turn raw product feedback into structured evidence for downstream agents. This skill is the consumption side of [Riffrec](https://github.com/kieranklaassen/riffrec), a capture tool that records synchronized screen + voice + event sessions and emits a `riffrec-*.zip` bundle.

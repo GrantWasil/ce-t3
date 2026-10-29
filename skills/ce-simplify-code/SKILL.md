@@ -4,6 +4,7 @@ description: "Simplify code for clarity, reuse, quality, and efficiency while pr
 argument-hint: "[blank for current branch changes, or describe what to simplify or audit] [mode:pipeline] [proof-test:<path>]"
 ---
 
+For reports, read `references/next-steps.md`.
 Simplify code for clarity, reuse, quality, and efficiency, and prune tests and comments that carry no value, while preserving exact behavior. Prioritize readable, explicit code over compact code — fewer lines is not the goal.
 
 ## Mode

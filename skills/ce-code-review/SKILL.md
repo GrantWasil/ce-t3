@@ -4,6 +4,7 @@ description: "Review a named diff or PR for bugs, regressions, tests, and standa
 argument-hint: "[mode:agent] [apply:local] [blank to review current branch, or provide PR link]"
 ---
 
+For reports, read `references/next-steps.md`.
 # Code Review
 
 Help the caller deliver a correct change within the agreed scope. Find defects and improvements whose consequences justify action; judge the code against its intended behavior and project requirements, not a preferred rewrite. Serious defects remain important even when the diff is small. An adequate change needs no findings.

@@ -343,7 +343,10 @@ Yes, if you want the harness to keep re-prompting until the run finishes. `ce-pl
 The `/goal` evaluator reads only the transcript, so name a state the transcript shows: when it finishes, `ce-work` prints where the work landed (a PR URL, or the local commit when it ships without a PR) and its review receipt or skip phrase.
 
 **What happens if I pass a requirements-only brainstorm file?**
-The run stops and tells you the Product Contract needs `ce-plan` enrichment first. It offers the exact `ce-plan <plan-path>` handoff. Blank invoke does the same if the newest matching artifact is still requirements-only.
+The run stops and tells you the Product Contract needs `ce-plan` enrichment first. It offers a copyable `ce-plan` continuation with the actual plan path and the gaps to resolve. Blank invoke does the same if the newest matching artifact is still requirements-only. Other blocked stops name the missing prerequisite, who can supply it, and how to resume. See [Next-step handoffs](./next-steps.md).
+
+**Does a deployment blocker stop local implementation?**
+Only actions that depend on the missing prerequisite stop. `ce-work` completes independent, authorized preparation and local verification before handing back the blocked remainder. For example, missing hosting authentication can block deployment and live integration checks while an executable probe and local contract tests can still be built. Local checks do not pass a live integration gate, and dependent dashboard work stays gated.
 
 ---
 

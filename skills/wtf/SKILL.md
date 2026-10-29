@@ -5,6 +5,7 @@ disable-model-invocation: true
 argument-hint: "[file path, URL, pasted text, or which part lost you; blank for the last message]"
 ---
 
+For reports, read `references/next-steps.md`.
 # wtf
 
 The user did not follow something. Explain it the way you would to a smart colleague who was not in the room.

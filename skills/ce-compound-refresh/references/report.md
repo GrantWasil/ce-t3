@@ -1,6 +1,6 @@
 # The refresh report
 
-**Print the full report as markdown — it is the deliverable, not an internal summary.** After processing the scope:
+**Print the full report as markdown.** It is the deliverable, not an internal summary, and in non-interactive mode it is the only one. Keep it self-contained and never abbreviated, split into **Applied** and **Recommended**. After processing the scope:
 
 ```text
 Compound Refresh Summary
