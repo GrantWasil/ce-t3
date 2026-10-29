@@ -15,7 +15,7 @@ import { transformContentForPi } from "../converters/claude-to-pi"
 import type { PiBundle } from "../types/pi"
 import { getLegacyPiArtifacts } from "../data/plugin-legacy-artifacts"
 import { cleanupStaleAgents, isLegacyAgentArtifactOwned, isLegacySkillArtifactOwned } from "../utils/legacy-cleanup"
-import { isPathWithinRoot, isPreservedSymlink, lstatOrNull, resolveLegacyManagedDir, resolveManagedSegment, storeRootEscapesManagedRoot } from "./managed-artifacts"
+import { isPathWithinRoot, isPreservedSymlink, lstatOrNull, resolveLegacyManagedDir, resolveManagedSegment, sanitizeManagedPluginName, storeRootEscapesManagedRoot } from "./managed-artifacts"
 
 const PI_AGENTS_BLOCK_START = "<!-- BEGIN COMPOUND PI TOOL MAP -->"
 const PI_AGENTS_BLOCK_END = "<!-- END COMPOUND PI TOOL MAP -->"
@@ -57,7 +57,7 @@ type PiPaths = {
 }
 
 export async function writePiBundle(outputRoot: string, bundle: PiBundle): Promise<void> {
-  const pluginName = bundle.pluginName ? sanitizeCodexPathComponent(bundle.pluginName) : undefined
+  const pluginName = bundle.pluginName === undefined ? undefined : sanitizeManagedPluginName(bundle.pluginName)
   const paths = resolvePiPaths(outputRoot, pluginName)
   const manifest = pluginName
     ? await readInstallManifestWithLegacyFallback(paths, pluginName)
@@ -272,10 +272,6 @@ function upsertBlock(existing: string, block: string): string {
   }
 
   return existing.trimEnd() + "\n\n" + block + "\n"
-}
-
-function sanitizeCodexPathComponent(name: string): string {
-  return sanitizePathName(name).replace(/[\\/]/g, "-")
 }
 
 export async function readPiInstallManifest(

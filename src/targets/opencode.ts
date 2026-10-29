@@ -99,7 +99,7 @@ export async function writeOpenCodeBundle(
   bundle: OpenCodeBundle,
   scope?: string,
 ): Promise<void> {
-  const pluginName = bundle.pluginName ? sanitizeManagedPluginName(bundle.pluginName) : undefined
+  const pluginName = bundle.pluginName === undefined ? undefined : sanitizeManagedPluginName(bundle.pluginName)
   const openCodePaths = resolveOpenCodePaths(outputRoot, pluginName, scope)
   const manifest = pluginName
     ? await readManagedInstallManifestWithLegacyFallback(openCodePaths.managedDir, pluginName)

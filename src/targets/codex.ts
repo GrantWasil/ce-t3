@@ -6,7 +6,7 @@ import type { ClaudeMcpServer } from "../types/claude"
 import { transformContentForCodex } from "../utils/codex-content"
 import { getLegacyCodexArtifacts } from "../data/plugin-legacy-artifacts"
 import { classifyCodexLegacyPromptOwnership, isLegacyAgentArtifactOwned, isLegacySkillArtifactOwned } from "../utils/legacy-cleanup"
-import { isContainedPath, isPathWithinRoot, isPreservedSymlink, lstatOrNull, storeRootEscapesManagedRoot } from "./managed-artifacts"
+import { isContainedPath, isPathWithinRoot, isPreservedSymlink, lstatOrNull, sanitizeManagedPluginName, storeRootEscapesManagedRoot } from "./managed-artifacts"
 
 const MANAGED_START_MARKER = "# BEGIN Compound Engineering plugin MCP -- do not edit this block"
 const MANAGED_END_MARKER = "# END Compound Engineering plugin MCP"
@@ -34,17 +34,27 @@ export async function writeCodexBundle(
   options: CodexWriteOptions = {},
 ): Promise<void> {
   const codexRoot = resolveCodexRoot(outputRoot, options)
-  await ensureDir(codexRoot)
-
-  const pluginName = bundle.pluginName ? sanitizeCodexPathComponent(bundle.pluginName) : undefined
-  const manifest = pluginName ? await readInstallManifest(codexRoot, pluginName) : null
+  const pluginName = bundle.pluginName === undefined ? undefined : sanitizeManagedPluginName(bundle.pluginName)
   const currentPrompts = bundle.prompts.map((prompt) => `${sanitizePathName(prompt.name)}.md`)
   const agents = bundle.agents ?? []
   const agentsRoot = pluginName
     ? path.join(codexRoot, "agents", pluginName)
     : path.join(codexRoot, "agents")
   const currentAgents = agents.map((agent) => `${sanitizePathName(agent.name)}.toml`)
+  // Include `externallyManagedSkillNames` so agents-only installs (default
+  // `--to codex`) treat skills installed via Codex's native plugin flow as
+  // "current" for cleanup purposes. Without this, `cleanupLegacyAgentSkillDirs`
+  // would see an empty `currentSkills` set and sweep allow-listed names such
+  // as `ce-plan` out of `.codex/skills/<plugin>/` into legacy-backup on every
+  // re-run of `install --to codex`.
+  const currentSkills = Array.from(new Set([
+    ...bundle.skillDirs.map((skill) => sanitizePathName(skill.name)),
+    ...bundle.generatedSkills.map((skill) => sanitizePathName(skill.name)),
+    ...(bundle.externallyManagedSkillNames ?? []).map((name) => sanitizePathName(name)),
+  ]))
   assertNoCodexAgentFilenameCollisions(agents)
+  await ensureDir(codexRoot)
+  const manifest = pluginName ? await readInstallManifest(codexRoot, pluginName) : null
 
   // Ancestor-symlink containment: the per-entry guards below inspect only the
   // leaf node, so a symlinked store dir (or a symlinked ancestor of it) pointed
@@ -75,17 +85,6 @@ export async function writeCodexBundle(
   const skillsRoot = pluginName
     ? path.join(codexRoot, "skills", pluginName)
     : path.join(codexRoot, "skills")
-  // Include `externallyManagedSkillNames` so agents-only installs (default
-  // `--to codex`) treat skills installed via Codex's native plugin flow as
-  // "current" for cleanup purposes. Without this, `cleanupLegacyAgentSkillDirs`
-  // would see an empty `currentSkills` set and sweep allow-listed names such
-  // as `ce-plan` out of `.codex/skills/<plugin>/` into legacy-backup on every
-  // re-run of `install --to codex`.
-  const currentSkills = Array.from(new Set([
-    ...bundle.skillDirs.map((skill) => sanitizePathName(skill.name)),
-    ...bundle.generatedSkills.map((skill) => sanitizePathName(skill.name)),
-    ...(bundle.externallyManagedSkillNames ?? []).map((name) => sanitizePathName(name)),
-  ]))
   const skillsEscaped = await storeRootEscapesManagedRoot(codexRoot, skillsRoot)
   if (!skillsEscaped) await cleanupRemovedSkills(skillsRoot, manifest, currentSkills)
 
@@ -99,7 +98,7 @@ export async function writeCodexBundle(
         continue
       }
       const targetDir = path.join(skillsRoot, skillName)
-      const preserved = await cleanupCurrentManagedSkillDir(targetDir, manifest, skillName)
+      const preserved = await cleanupCurrentManagedSkillDir(skillsRoot, targetDir, manifest, skillName)
       if (preserved) {
         preservedSkillNames.add(skillName)
         continue
@@ -122,7 +121,7 @@ export async function writeCodexBundle(
         continue
       }
       const skillDir = path.join(skillsRoot, skillName)
-      const preserved = await cleanupCurrentManagedSkillDir(skillDir, manifest, skillName)
+      const preserved = await cleanupCurrentManagedSkillDir(skillsRoot, skillDir, manifest, skillName)
       if (preserved) {
         preservedSkillNames.add(skillName)
         continue
@@ -239,10 +238,6 @@ export async function writeCodexBundle(
 function resolveCodexRoot(outputRoot: string, options: CodexWriteOptions): string {
   if (options.outputIsCodexRoot) return outputRoot
   return path.basename(outputRoot) === ".codex" ? outputRoot : path.join(outputRoot, ".codex")
-}
-
-function sanitizeCodexPathComponent(name: string): string {
-  return sanitizePathName(name).replace(/[\\/]/g, "-")
 }
 
 export async function readCodexInstallManifest(codexRoot: string, pluginName: string): Promise<CodexInstallManifest | null> {
@@ -372,10 +367,15 @@ async function cleanupRemovedAgents(
 // subsequent copy/write -- writing through a preserved symlink would clobber
 // the user's fork, which is worse than not overwriting at all).
 async function cleanupCurrentManagedSkillDir(
+  rootDir: string,
   targetDir: string,
   manifest: CodexInstallManifest | null,
   skillName: string,
 ): Promise<boolean> {
+  if (!(await isPathWithinRoot(rootDir, targetDir))) {
+    console.warn(`Skipping ${targetDir}: resolves outside the managed store (not modified)`)
+    return true
+  }
   const stat = await lstatOrNull(targetDir)
   if (!stat) return false
   if (stat.isSymbolicLink()) {

@@ -1,6 +1,6 @@
 import path from "path"
 import { parseFrontmatter } from "../utils/frontmatter"
-import { readJson, readText, pathExists, walkFiles } from "../utils/files"
+import { readJson, readText, pathExists, walkFiles, validateComponentName } from "../utils/files"
 import type {
   ClaudeAgent,
   ClaudeCommand,
@@ -17,6 +17,7 @@ export async function loadClaudePlugin(inputPath: string): Promise<ClaudePlugin>
   const root = await resolveClaudeRoot(inputPath)
   const manifestPath = path.join(root, PLUGIN_MANIFEST)
   const manifest = await readJson<ClaudeManifest>(manifestPath)
+  validateComponentName(manifest.name)
 
   const agents = await loadAgents(resolveComponentDirs(root, "agents", manifest.agents))
   const commands = await loadCommands(resolveComponentDirs(root, "commands", manifest.commands))
@@ -61,7 +62,7 @@ async function loadAgents(agentsDirs: string[]): Promise<ClaudeAgent[]> {
   for (const file of files) {
     const raw = await readText(file)
     const { data, body } = parseFrontmatter(raw, file)
-    const name = (data.name as string) ?? deriveMarkdownStem(file)
+    const name = validateComponentName(data.name ?? deriveMarkdownStem(file))
     agents.push({
       name,
       description: data.description as string | undefined,
@@ -81,7 +82,7 @@ async function loadCommands(commandsDirs: string[]): Promise<ClaudeCommand[]> {
   for (const file of files) {
     const raw = await readText(file)
     const { data, body } = parseFrontmatter(raw, file)
-    const name = (data.name as string) ?? path.basename(file, ".md")
+    const name = validateComponentName(data.name ?? path.basename(file, ".md"))
     const allowedTools = parseAllowedTools(data["allowed-tools"])
     const disableModelInvocation = data["disable-model-invocation"] === true ? true : undefined
     commands.push({
@@ -105,7 +106,7 @@ async function loadSkills(skillsDirs: string[]): Promise<ClaudeSkill[]> {
   for (const file of skillFiles) {
     const raw = await readText(file)
     const { data } = parseFrontmatter(raw, file)
-    const name = (data.name as string) ?? path.basename(path.dirname(file))
+    const name = validateComponentName(data.name ?? path.basename(path.dirname(file)))
     const disableModelInvocation = data["disable-model-invocation"] === true ? true : undefined
     const userInvocable = data["user-invocable"] === false ? false : undefined
     const ce_platforms = Array.isArray(data.ce_platforms) ? (data.ce_platforms as string[]) : undefined

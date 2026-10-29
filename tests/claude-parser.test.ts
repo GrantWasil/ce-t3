@@ -51,6 +51,23 @@ async function makeMinimalPluginRoot(): Promise<string> {
 }
 
 describe("loadClaudePlugin", () => {
+  test.each(["..", "ns/evil", "ns\\evil"])("rejects unsafe manifest name %j", async (name) => {
+    const root = await makeMinimalPluginRoot()
+    await fs.writeFile(path.join(root, ".claude-plugin/plugin.json"), JSON.stringify({ name, version: "1.0.0" }))
+    await expect(loadClaudePlugin(root)).rejects.toThrow("Invalid component name")
+  })
+
+  test.each(["skills/payload/SKILL.md", "agents/payload.md", "commands/payload.md"])(
+    "rejects unsafe component name in %s",
+    async (relativePath) => {
+      const root = await makeMinimalPluginRoot()
+      const file = path.join(root, relativePath)
+      await fs.mkdir(path.dirname(file), { recursive: true })
+      await fs.writeFile(file, "---\nname: ns/evil\n---\nFixture\n")
+      await expect(loadClaudePlugin(root)).rejects.toThrow("Invalid component name")
+    },
+  )
+
   test("repository tree exposes only the root Claude plugin manifest", async () => {
     const manifests: string[] = []
     const glob = new Bun.Glob("**/.claude-plugin/plugin.json")

@@ -75,6 +75,14 @@ export async function walkFiles(root: string): Promise<string[]> {
   return results
 }
 
+export function validateComponentName(name: unknown): string {
+  if (typeof name !== "string" || /[\\/\u0000]/.test(name) ||
+      name.split(":").some((part) => !part.trim() || part === "." || part === "..")) {
+    throw new Error(`Invalid component name ${JSON.stringify(name)}: expected a name, not a filesystem path`)
+  }
+  return name
+}
+
 /**
  * Sanitize a name for use as a filesystem path component.
  * Replaces colons with hyphens so colon-namespaced names
@@ -82,7 +90,7 @@ export async function walkFiles(root: string): Promise<string[]> {
  * instead of failing on Windows where colons are illegal in filenames.
  */
 export function sanitizePathName(name: string): string {
-  return name.replace(/:/g, "-")
+  return validateComponentName(name).replace(/:/g, "-")
 }
 
 /**
