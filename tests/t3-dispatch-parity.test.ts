@@ -14,7 +14,7 @@ const ADAPTER = "references/t3-dispatch.md"
 const CONSUMERS: Record<string, string[]> = {
   "ce-plan": ["references/reasoning-elevation.md"],
   "ce-brainstorm": ["references/reasoning-elevation.md"],
-  "ce-work": ["references/cross-model-execution.md", "references/execution-strategy.md"],
+  "ce-work": ["references/cross-model-execution.md", "references/execution-strategy.md", "references/multi-pr-delivery.md"],
   "ce-code-review": ["references/cross-model-review.md", "references/dispatch-reviewers.md"],
   "ce-doc-review": ["references/cross-model-review.md", "references/dispatch.md"],
   "ce-pov": ["references/cross-model-panel.md"],
