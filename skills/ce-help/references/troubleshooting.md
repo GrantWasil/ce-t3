@@ -4,7 +4,7 @@
 
 | What the user sees | What to tell them |
 |---|---|
-| A skill is missing, or behaves the old way after an update | Refresh the marketplace before updating the plugin, because updating alone reads a stale snapshot. Then start a new session. `docs/install/upgrading.md` has the commands for Claude Code, Codex, and Grok Bot. Other hosts' update steps are in `README.md#more-install-options`. |
+| A skill is missing, or behaves the old way after an update | For this fork in T3's Claude or Codex host, use `docs/install/t3.md` to refresh the fork's installed content, then start a new session. Other hosts' update steps are in `docs/install/upgrading.md` and `README.md#more-install-options`. |
 | An old copy of a skill keeps running after an update | An earlier Bun install may be shadowing the plugin. `docs/install/upgrading.md` has the cleanup command. |
 | The agent will not start a skill it recommended | The skill is manual-only, so the user has to type it. `references/skill-map.md` marks these. |
 | The slash command is not recognized | The form depends on the host. Codex uses `$skill-name`. On oh-my-pi, a manual-only skill needs `/skill:<name>`. Devin uses `/compound-engineering:<skill>`. |

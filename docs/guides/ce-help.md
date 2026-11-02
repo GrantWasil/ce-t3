@@ -48,7 +48,7 @@ Manual invoke only. In Codex use `$ce-help`; in oh-my-pi use `/skill:ce-help`.
 
 **Its skill map ships with your install.** The map from goals to skills is part of the skill, so it names only the skills you have and works offline. The test suite checks that it covers every skill and correctly marks the manual-only ones, which an agent cannot start for you.
 
-**Details come from the docs, not from memory.** It fetches a page before quoting a flag, config key, or default. Those docs track `main`, so if a page describes something your install lacks, it says an upgrade may be needed.
+**Details come from this fork's docs.** It fetches a page from `GrantWasil/ce-t3` before quoting a flag, config key, or default, and uses the T3 installation guide for this fork's Claude and Codex hosts. Those docs track `main`, so if a page describes something your install lacks, it says an upgrade may be needed.
 
 **It separates what your work decides from what is your preference.** Where to start depends on what is already settled, so it gives a direct answer. Whether to run each step yourself or hand off to `lfg` is up to you, so it shows what each option means instead of picking one, unless you have already said how you like to work.
 

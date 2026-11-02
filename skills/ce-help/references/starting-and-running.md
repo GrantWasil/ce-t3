@@ -4,7 +4,7 @@
 
 ## Starting out
 
-1. Install steps differ across CE's 14 hosts, so take them from `README.md#install` or `README.md#more-install-options` rather than guessing.
+1. For this fork in T3's Claude or Codex host, use `docs/install/t3.md`. Other hosts' install steps are in `README.md#install` or `README.md#more-install-options`.
 2. A host loads skills at session start, so begin a new session after any install or update.
 3. Run `ce-setup` in the project. It reports optional tools and offers to create the repo config. A missing optional tool is not a failure, and only the workflows that use it need it.
 4. Begin on real work: `ce-brainstorm` for an idea, or `ce-debug` for a bug.

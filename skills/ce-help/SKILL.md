@@ -26,7 +26,7 @@ If a message that reaches this skill asks for work rather than advice, as in "fi
 | Which skill does a job, what a skill does, or whether it is worth using | `references/skill-map.md` |
 | Where to start, what comes next, how skills connect, or whether to use `lfg` | `references/workflow.md`, plus the loop section below |
 | Installing, getting started, cost, or adapting CE to a project | `references/starting-and-running.md` |
-| Something that broke or surprised them | `references/troubleshooting.md`; for what looks like a CE bug with no entry there, `https://github.com/EveryInc/compound-engineering-plugin/issues` |
+| Something that broke or surprised them | `references/troubleshooting.md`; for what looks like a CE bug with no entry there, `https://github.com/GrantWasil/ce-t3/issues` |
 
 Most messages already show which row applies. When none does, use the host's blocking question tool, or chat if it has none, to ask what they are trying to do right now: start something new, continue work in progress, find a skill for one job, sort out a problem, or change CE's defaults.
 
@@ -52,7 +52,7 @@ This skill resolves `<root>` only when an answer needs an artifact folder, and i
 
 The references in this skill hold routing and stable boundaries, not how each skill works. Each skill's description and guide page own that, and they win if they disagree with a reference. A skill absent from your context is not a disagreement, because hosts often leave manual-only skills out and can shorten long lists.
 
-Do not answer from memory of CE. Skills change with every release, so what you recall may be out of date. State how a skill behaves only from these references, its description in your context, or a guide page you read during this run. Fetch the page when the answer depends on something they do not cover, such as a flag, config key, default, or what one of its stages does. Link `https://github.com/EveryInc/compound-engineering-plugin/blob/main/<path>`. If that will not load, fetch `https://raw.githubusercontent.com/EveryInc/compound-engineering-plugin/main/<path>`.
+Do not answer from memory of CE. Skills change with every release, so what you recall may be out of date. State how a skill behaves only from these references, its description in your context, or a guide page you read during this run. Fetch the page when the answer depends on something they do not cover, such as a flag, config key, default, or what one of its stages does. Link `https://github.com/GrantWasil/ce-t3/blob/main/<path>`. If that will not load, fetch `https://raw.githubusercontent.com/GrantWasil/ce-t3/main/<path>`.
 
 | Path | Holds |
 |---|---|
@@ -61,6 +61,7 @@ Do not answer from memory of CE. Skills change with every release, so what you r
 | `docs/guides/configuration.md` | Every `.compound-engineering/config.yaml` option |
 | `docs/guides/packs.md` | Compound Packs |
 | `docs/install/upgrading.md` | Upgrading and cleaning up old installs |
+| `docs/install/t3.md` | Installing and updating this fork in T3's Claude and Codex hosts |
 | `README.md#install`, `README.md#more-install-options` | Install steps for each host |
 
 These pages track `main` and can be newer than the user's install. When a page describes a feature their copy of the skill lacks, say an upgrade may be needed. When a page cannot be fetched, answer from the references and descriptions, include the link, and say you did not check the page.
