@@ -7,7 +7,7 @@ argument-hint: "[mode:author|edit|detect] [text, file path, or nothing]"
 For reports, read `references/next-steps.md`.
 # Write without slop
 
-Prose that carries no AI tells and that a reader understands on the first read, with every fact the source stated still there. Both goals hold at once: text that is free of tells but still dense has failed, and text that is plain but changes how certain a claim is has failed.
+Remove AI tells and make prose understandable on the first read while preserving every source fact and its certainty.
 
 **Done:** the mode's output is returned, every fact, number, name, quote, and citation in the input survives, and nothing was added that the source or the caller did not supply.
 
@@ -35,10 +35,10 @@ Pick by who reads the result. The caller's own interaction contract wins over an
 
 Apply these to every sentence, in author mode as constraints and in edit or detect mode as checks.
 
-1. **Mechanism.** Does the sentence say what the thing does, or how it feels? Replace the feeling with the fact it displaced, or cut the sentence.
+1. **Mechanism.** Does the sentence say what the thing does, or how it feels or what it is like? Replace the feeling or figure with the fact it displaced, or cut the sentence.
 2. **Portability.** Could the sentence move to another project unchanged? Then it carries no fact about this one.
 3. **Actor.** Who does the verb? Name them when the source says who. Keep the passive when the actor is unknown or naming it adds nothing.
-4. **One idea.** Would the reader have to reread to hold the sentence? Split it. A sentence the reader gets on the first pass stays, however long.
+4. **One idea.** Would the reader have to reread or decode the sentence? Split it or spell it out. A sentence the reader gets on the first pass stays, however long.
 5. **Density.** One device proves nothing. Three or more distinct patterns in a passage, or one repeated across passages, is a finding.
 6. **Decision first.** Does the first sentence carry the outcome the reader needs?
 7. **Reader.** Can someone without the document or the code open act on this? Gloss the identifier or name the consequence.
