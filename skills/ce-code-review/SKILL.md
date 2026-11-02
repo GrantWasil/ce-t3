@@ -7,7 +7,7 @@ argument-hint: "[mode:agent] [apply:local] [blank to review current branch, or p
 For reports, read `references/next-steps.md`.
 # Code Review
 
-Help the caller deliver a correct change within the agreed scope. Find defects and improvements whose consequences justify action; judge the code against its intended behavior and project requirements, not a preferred rewrite. Serious defects remain important even when the diff is small. An adequate change needs no findings.
+Find defects and improvements whose consequences justify action. Judge the code against intended behavior and project requirements, not preferred rewrites. Stay within the agreed scope. Serious defects matter even in small diffs. An adequate change needs no findings.
 
 **Done when:** required review and validation are complete, retained findings are supported by the source, and the caller has a clear result with any remaining coverage limits. Apply only when the invocation authorizes it, under the rules below.
 
@@ -37,5 +37,6 @@ Follow these steps in order; the references supply the detail but never change t
 
 - **Report-only by default; never push.** A bare `ce-code-review` invocation produces findings and does not apply them. Entering the apply stage requires `apply:local`, or an explicit user request in the invoking prompt to apply or fix this review's findings; a deprecated `mode:autofix` token is neither. `mode:agent` never mutates the tree, even when nested inside a workflow that later applies findings. Never push, open PRs, or file tickets in any mode.
 - **No blocking prompts.** Never use `AskUserQuestion`, `request_user_input`, `ask_user`, or other blocking question tools. Infer intent, plan, and scope from explicit tokens, git state, PR metadata, and conversation. Note uncertainty in Coverage or the verdict — do not stop to ask.
+- **A spawned worker or peer starts a new context and does not continue the parent conversation.**
 - **Explicit mutations only.** Never run `gh pr checkout`, `git checkout`, `git switch`, or similar branch-switch commands. Passing a PR number, URL, or branch name selects **review scope**, not permission to mutate the working tree. Uncommitted work can only be reviewed from the checkout that holds it, so to review it on a feature branch, stay on that branch (or check it out yourself) and pass `base:` or no target.
 - **Report outcomes, not machinery.** What you show the user is about the review: what is being examined, which coverage is included and the one-line reason for each conditional lens, the independent cross-model pass, and the findings. Name what the user would recognize, such as a PR number, a reviewer's concern, or a peer model. This skill's internal labels, dispatch bookkeeping, and setup narration stay out of user-facing text. Never claim more about the peer than its receipt attests. This governs *what* you surface and suppress, not the wording; use your own voice.

@@ -5,7 +5,7 @@ argument-hint: "[feature, bug, issue reference, or plan path; optionally assign 
 ---
 
 For reports, read `references/next-steps.md`.
-**Outcome.** The request reaches the end state its shape calls for, produced by the Compound Engineering skill whose job that is, with everything unresolved recorded where the user will see it. Most requests end with that skill's result and no branch. A change to the code is the one shape with more steps of its own: it ends in an open pull request whose URL you hold, with CI decided, after being implemented, simplified, reviewed with the eligible findings applied and the rest recorded, any durable learning captured, committed, and pushed. Merging stays with the user unless they granted it for this run.
+**Outcome.** Complete the request through the appropriate Compound Engineering skills, with everything unresolved recorded where the user will see it. Non-code requests end with the owning skill's result and no branch. Code changes end in an open PR whose URL you hold, with CI decided, after being implemented, simplified, reviewed with eligible findings applied and the rest recorded, any durable learning captured, committed, and pushed. Merging stays with the user unless they granted it for this run.
 
 **Work source.** On the routes that change the code, nothing is implemented without a work source verified this run, and only two things qualify: an implementation-ready plan, which `ce-work` implements; or a `fixed` return from `ce-debug`, where the fix is the implementation. The plan is one the session identifies, as `references/intake.md` defines. Never search the plans directory for a candidate or act on a file you discovered. Never plan from scratch over an existing plan.
 
@@ -49,7 +49,7 @@ Resolve every skill named here against the host's available-skills list and invo
 
 6. **Autonomous residual handoff**: whenever an unapplied actionable finding, a `settled_conflict` stamp from step 4, or a proceeded-and-flagged `settled_decision_conflicts` entry from step 2 exists, record it durably per that file: in the PR body, or in tickets or the DONE report when no PR will exist. Skip only when none of the three exists. Do not output DONE until the residuals are durable. Never block DONE on tracker filing failures once the report states them. Do not prompt the user.
 
-7. Invoke the `ce-compound` skill with `mode:non-interactive` when the run produced durable reasoning the code, tests, and plan do not carry; that file states the full condition.
+7. Invoke the `ce-compound` skill with `mode:non-interactive` when the run produced durable reasoning the code, tests, and plan do not carry; that file states the full condition. `Documentation skipped` is success; running here puts the lesson in the PR at open.
 
 8. Invoke the `ce-test-browser` skill with `mode:pipeline`.
 
