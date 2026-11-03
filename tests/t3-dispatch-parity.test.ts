@@ -84,10 +84,11 @@ describe("T3 Code dispatch adapter", () => {
     expect(adapter).toContain("Never wrap a skill invocation in a delegated task")
   })
 
-  test("lfg lets only a checkpointed T3 wait end the turn before DONE", async () => {
+  test("lfg preserves checkpointed task and host PR waits before DONE", async () => {
     const body = await read("lfg", "SKILL.md")
     const visibility = compact(await read("lfg", "references/task-visibility.md"))
-    expect(body).toContain("the turn ends only at DONE, a stop, or a child's checkpointed T3 Code wait")
+    expect(body).toContain("the turn may end only on a checkpointed wait whose wake resumes the workflow")
+    expect(visibility).toContain("When a child uses a host-mandated PR watch, preserve the waiting stage and the remaining pipeline steps in its checkpoint")
     expect(visibility).toContain("That checkpoint names this run's next numbered step as a stage still owed")
     expect(visibility).toContain("Invoking a child skill is never itself a reason to delegate it to a T3 task")
   })
