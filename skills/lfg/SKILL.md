@@ -29,7 +29,7 @@ For reports, read `references/next-steps.md`.
 
 A stop leaves nothing pushed that was not already pushed.
 
-Resolve every skill named here against the host's available-skills list and invoke that exact entry; some hosts namespace it (`compound-engineering:ce-plan`). Read `references/task-visibility.md` before starting. It defines the stage view through the platform's task-tracking capability, narration, and completion rules: a step is done only after it ran, and a child skill's return resumes the next numbered step in the same turn. Before DONE or a stop, the turn may end only on a checkpointed wait whose wake resumes the workflow.
+Resolve every skill named here against the host's available-skills list and invoke that exact entry; some hosts namespace it (`compound-engineering:ce-plan`). Read `references/task-visibility.md` before starting. It defines the stage view through the platform's task-tracking capability, narration, and completion rules: a step is done only after it ran, and a child skill's return resumes the next numbered step in the same turn. Before DONE or a stop, the turn may end only on a wait whose wake resumes this session and its unfinished workflow.
 
 ## The run (routes that change the code)
 

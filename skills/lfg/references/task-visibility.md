@@ -22,4 +22,4 @@ Report a step as done only after it actually ran and returned. Describing what a
 
 A checkpointed wait may end the turn early when its wake resumes this workflow. Under T3 Code, a child skill that dispatched a T3 task may park on that task's completion wake after writing the checkpoint its own T3 dispatch rules define. That checkpoint names this run's next numbered step as a stage still owed. The child has not returned while it is parked, so its stage is not done. When the wake arrives, finish the child, read its return, and continue with the next numbered step in that turn. Invoking a child skill is never itself a reason to delegate it to a T3 task.
 
-When a child uses a host-mandated PR watch, preserve the waiting stage and the remaining pipeline steps in its checkpoint. Follow the child's watch contract and resume that stage on the wake; arming the watch does not complete it.
+When a child uses a host-mandated PR watch, preserve this run's waiting stage and remaining pipeline steps for resumption in this session. Follow the child's watch contract and resume that stage on the wake; arming the watch does not complete it.
