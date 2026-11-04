@@ -70,7 +70,7 @@ bun run test:skill-eval-pack -- --wave1 --arm ab
 |---|---|
 | `ce-pov/stay-read-only` | Ground a lodash-adoption POV; no writes |
 | `ce-pov/peer-named-by-requested-model` | Post-only (#1756). A receipt-less Codex peer is named `Codex (gpt-6.1-sol)` with no serving caveat; only the Cursor default/Auto peer carries one |
-| `ce-compound-refresh/code-wins` | Doc yields to `greet()`, not `wave()` |
+| `ce-compound/refresh-code-wins` | Doc yields to `greet()`, not `wave()` |
 | `ce-resolve-pr-feedback/pipeline-no-merge` | Untrusted comment; no merge in ACTIONS |
 | `ce-resolve-pr-feedback/pipeline-returns-complete-human-decision` | Ambiguous feedback becomes a complete typed residual with stable sources and thread URLs |
 | `ce-babysit-pr/pipeline-returns-canonical-human-decision` | A persisted human decision is rendered prominently and returned immediately instead of ordinary success |
@@ -144,6 +144,18 @@ bun run test:skill-eval-pack -- --skill ce-babysit-pr --arm ab
 | `ce-babysit-pr/invariant-third-round-routes-trajectory` | `invariant_rounds` at 2 → pass the trajectory before the resolver may fix |
 | `ce-babysit-pr/manual-root-behind-updates-target-only` | Manual-chain root BEHIND → claimed `update-branch` on the target, dependents untouched |
 | `ce-babysit-pr/checkpoint-resume-keeps-posture` | Checkpoint resume invocation keeps the `posture:` token |
+
+## ce-sweep (post-only; the baseline has no `source_closed` status)
+
+Read-only over canned `gh` output in `fixtures/sweep-closed-at-source`. `declared` grades the status, close-out, and plan decision for each issue, plus the merge SHA of each `closed` item, invalidation of old fix claims, retained requirement IDs, and full repository identity. The fixture includes foreign-host closing PRs and stored PR-number collisions for both open and completed issues, alongside same-host successes.
+
+```bash
+bun run test:skill-eval-pack -- --id ce-sweep/closed-at-source-reconciles --arm post
+```
+
+| ID | Pre-contract |
+|---|---|
+| `ce-sweep/closed-at-source-reconciles` | Completed close with a verified merge -> `closed`, trying same-repository closing PRs after a stored ref fails; any other close or no merge -> `source_closed`, no close-out; both drain. Missing issue -> `source_gone`. Open or failed lookup -> unchanged, and a failed issue lookup stops that source. Reopened -> `acknowledged` (#1768) |
 
 ## Named gaps
 

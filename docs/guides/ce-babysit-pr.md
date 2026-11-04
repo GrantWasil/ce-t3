@@ -78,13 +78,13 @@ Hand-babysitting, or a naive loop, usually fails in the same ways:
 
 ## The Solution
 
-Each tick is stateless and resumable from disk. The harness keeps the session active while waiting for the detector's output.
+Each tick is stateless and resumable from disk. One wake source brings the agent back for each tick.
 
 - Comments first. New review threads and non-thread comments get handled before CI. If that pass pushed a commit, the old CI failure sits on a dead SHA and gets skipped
 - Delegation. `/ce-resolve-pr-feedback` for comments, `/ce-debug` for real failures (once per new signature). The only inline CI work is a cheap flaky-vs-real split
-- Consumption-only branch currency. The base gets merged or updated into the PR only when the snapshot emits a `branch_currency` item (`BEHIND` via GitHub's update-branch endpoint, `DIRTY` via an exact-base local repair) and only after it is claimed. Ordinary base movement on a CLEAN PR, a sibling merging, or someone saying "update the branch" never triggers one. A disputable conflict becomes a sticky `needs-human`; an unrequested base merge on the head gets flagged as a defect
-- Settle window. "Looks ready" needs GitHub `CLEAN`, no open feedback, no parked `needs-human`, and enough quiet time. A started-but-unfinished review waits at least 15 quiet minutes and at most 30
-- In-session watch by default. `pr-snapshot watch` polls with no agent tokens and prints `BABYSIT_WAKE` only on an actionable change. Checkpoint mode runs one tick and prints the resume command. It applies only when requested or when the harness cannot keep the session active while waiting for detector output
+- Consumption-only branch currency. The base gets merged or updated into the PR only when the snapshot emits a `branch_currency` item (`BEHIND` via GitHub's update-branch endpoint, `DIRTY` via an exact-base local repair) and only after it is claimed. Ordinary base movement on a CLEAN PR, a sibling merging, or someone saying "update the branch" never triggers one. Under `target` and `stack-ready` the skill never merges, so a `BEHIND` branch is left for whoever merges: no update, no CI rerun on every base move, and the ready report says to update the branch when you merge. `stack-land` or an explicit request to keep the branch current keeps updating it. A disputable conflict becomes a sticky `needs-human`; an unrequested base merge on the head gets flagged as a defect
+- Settle window. "Looks ready" needs GitHub `CLEAN` (or, under `target`/`stack-ready`, `BEHIND` as the only gap), no open feedback, no parked `needs-human`, and enough quiet time. A started-but-unfinished review waits at least 15 quiet minutes and at most 30. Under `stack-land`, a layer whose review already finished on the current head needs only 60 quiet seconds
+- In-session watch by default. `pr-snapshot watch` polls with no agent tokens and prints `BABYSIT_WAKE` only on an actionable change. When a host's instructions dictate how PR waits work, its own mechanism replaces the detector and the ticks stay the same. That wake may cover less than the detector does, so reports say what it may miss. Checkpoint mode runs one tick and prints the resume command. It applies only when requested or when nothing can wake the agent
 - Posture for confirmed managed stacks. `target` stops at the named PR. `stack-ready` continues upstack without merging. `stack-land` continues and lands the settled prefix
 
 A `needs-human` item blocks the ready call. It does not end the watch. New comments and CI still get handled.
@@ -117,7 +117,7 @@ A clean rebase does not prove a PR still belongs. A PR that only adds a file und
 
 | Verdict | Meaning | What happens |
 |---------|---------|--------------|
-| Update | The goal still matters and the implementation is the right shape | Watching continues. If you asked for an update, or said yes when asked, it rebases first |
+| Update | The goal still matters and the implementation is the right shape | Watching continues. If you asked for an update, it rebases first |
 | Rework | The goal still matters, but a mechanical update would keep the wrong implementation | It describes the smallest credible rework and stops. Ask and it hands the rework to `/ce-work` |
 | Close | Superseded, obsolete, directionally wrong, or not worth its cost | It recommends closing with the evidence and stops. It closes only with your permission |
 
@@ -171,9 +171,9 @@ Each piece of machinery still has to justify itself. When a piece turns out to e
 
 A review bot posts three inline threads while CI is still running. The next tick sends them to `/ce-resolve-pr-feedback`, which fixes two and parks one as `needs-human`. That push invalidates the in-flight CI SHA, so the skill does not debug the old failure.
 
-New CI comes back red on a real test. `/ce-debug` fixes and pushes. Base moves; the PR is `BEHIND`. Host branch-update succeeds because the merge is mechanical.
+New CI comes back red on a real test. `/ce-debug` fixes and pushes. Base moves; the PR is `BEHIND`. Under the default `target` posture the skill leaves the update for merge time instead of restarting CI.
 
-The parked thread still blocks "ready." A reviewer answers it. The next tick resolves the rest, waits out the settle window, and reports looks-ready. You merge.
+The parked thread still blocks "ready." A reviewer answers it. The next tick resolves the rest, waits out the settle window, and reports looks-ready with a note to update the branch when you merge. You update and merge.
 
 ---
 
@@ -246,7 +246,7 @@ Under `target` and `stack-ready`, no. It tells you when the PR *looks* ready. Fo
 A comment fix pushes and retriggers CI. Handling comments during the run collapses the two timelines.
 
 **How does it avoid "green, then surprise review"?**
-It never calls ready on one green snapshot. It needs `CLEAN`, an empty attention set, and a settle window. A started review gets 15 to 30 quiet minutes. Late activity resets the clock. The wording stays "looks ready, your call."
+It never calls ready on one green snapshot. It needs `CLEAN` (or a `BEHIND` branch left for you to update at merge), an empty attention set, and a settle window. A started review gets 15 to 30 quiet minutes. Late activity resets the clock. The wording stays "looks ready, your call."
 
 **Does it run forever in the background?**
 The default is an in-session watch: a token-free detector wakes the agent only when something changed. Close the session and re-invoke to resume from disk. For a multi-day unattended watch, use a durable scheduler (or cron running the resume command). It never fakes a loop with foreground `sleep`.
@@ -258,7 +258,7 @@ It classifies (flaky -> one rerun; real -> `/ce-debug`) and delegates. Comments 
 It previews the exact observed base first. It completes a merge only when every conflict has one mechanical answer that preserves the PR's intent, and when push authority to that head is known. Otherwise it parks a `needs-human`. Its routine conflict handling never rebases or force-pushes. Managed stacks stay on the manager's restack path.
 
 **Will it rebase my PR?**
-Only when you ask it to update or rebase the PR, or say yes when the old-PR check asks. It first decides whether the PR still belongs, then rebases with a series comparison and a lease on the starting head. Unattended runs never rebase.
+Only when you ask it to update or rebase the PR. A moved base alone is not a reason. It first decides whether the PR still belongs, then rebases with a series comparison and a lease on the starting head. Unattended runs never rebase.
 
 **What happens when the base keeps moving?**
 Each distinct head/base/status observation has a bounded claim-and-confirm cycle. Routine movement can be applied many times. The same unchanged observation is not retried across restarts. A parked semantic conflict stays parked when later base commits do not change the conflict.
