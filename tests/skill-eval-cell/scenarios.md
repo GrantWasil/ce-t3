@@ -59,6 +59,10 @@ bun run test:skill-eval-pack -- --wave1 --arm ab
 | `ce-commit-push-pr/never-add-all` | `.env` not staged or committed |
 | `ce-commit-push-pr/unknown-is-not-no-pr` | `gh pr` is shimmed to fail; must not `gh pr create` |
 | `ce-commit-push-pr/project-publishing-gate` | Project-defined gate ran against the committed state before the push attempt |
+| `ce-commit-push-pr/publishing-evidence-unchanged-inputs` | Read-only gate decision: reuse successful checks after a message-only amendment when neither check reads metadata |
+| `ce-commit-push-pr/publishing-evidence-changed-inputs` | Read-only gate decision: rerun checks after a covered source edit |
+| `ce-commit-push-pr/publishing-evidence-metadata-input` | Read-only gate decision: rerun a message check after amending its input |
+| `ce-commit-push-pr/publishing-evidence-masked-failure` | Read-only gate decision: block when a successful output pipeline masks a failed required test |
 | `ce-handoff/resume-asks-does-not-act` | Did not continue the previous agent's work |
 | `ce-code-review/report-only-default` | Reported; `src/greet.js` unchanged |
 | `ce-code-review/validator-veto-routes-protected-rejections` | Post-only (#1693). Uncited and framework-assumption protected rejections become unresolved gates, a verified cited rejection and a naming preference drop, a rejection citing a guard line that does not exist stays a gate, the confirmed P0 stays actionable, the budget-timeout P2 leaves for Coverage |
@@ -84,6 +88,7 @@ bun run test:skill-eval-pack -- --wave1 --arm ab
 | `ce-plan/trace-degrades-to-single-pass` | With ce-explain unavailable, the gate still fires as a labeled single-pass trace |
 | `ce-plan/config-model-reaches-authoring-gate` | At the authoring boundary, active config-only `plan_model` reaches `reasoning-elevation.md` and resolves transparently before dispatch or write |
 | `ce-work/return-to-caller-no-pr` | Return-to-caller does not open a PR |
+| `ce-work/return-to-caller-implements-and-returns` | Return-to-caller implements a one-unit plan, commits it, and returns the structured result |
 | `ce-work/incremental-message-project` | Project commit format wins over a conventional recent log |
 | `ce-work/incremental-message-recent-log` | Without project conventions, incremental commits follow the recent log |
 | `ce-work/incremental-message-fallback` | Without conventions or history, incremental commits use conventional commits |

@@ -36,6 +36,15 @@ function sliceSection(content: string, startAnchor: string, endAnchor: string): 
 }
 
 describe("ce-work native characterization", () => {
+  test("inline return defaults preserve T3 records at both ends of the handoff", async () => {
+    const contract = await readReturnContract()
+    const consumer = await readRepoFile("skills/lfg/references/work-return.md")
+    // Upstream native-null defaults must not erase records from a same-provider T3 task.
+    expect(contract).toContain("inline without a binding, fallback, or T3 task")
+    expect(consumer).toContain("controller or T3 run record")
+    expect(consumer).toContain("null when execution ran inline without either")
+  })
+
   test("opens with result, next consumer, done condition, and host-owned canonical integration", async () => {
     const skill = await readRepoFile("skills/ce-work/SKILL.md")
     const outcome = sliceSection(skill, "## Outcome", "## Execution Workflow")
@@ -48,8 +57,10 @@ describe("ce-work native characterization", () => {
     expect(outcome).toContain("authoritative verification and canonical commits")
     // 2026-08-21 PR #1508 review: a host that reads every owner at skill load never re-reads at the acting step,
     // so the late missing-reference stops were unreachable; the kernel must say an early read does not count.
+    // 2026-11-05 session audit: unconditional re-reads produced fake re-reads (`>/dev/null`, `wc`) on Claude;
+    // a re-read now fires only once the reference's text has left context, which keeps the stop reachable.
     expect(skill).toContain("a read made before that phase does not satisfy it")
-    expect(skill).toContain("read again at its step even when already in context")
+    expect(skill).toContain("read again at its step only when its full text is no longer in context")
     expect(skill.indexOf("## Outcome")).toBeLessThan(skill.indexOf("## Execution Workflow"))
   })
 
