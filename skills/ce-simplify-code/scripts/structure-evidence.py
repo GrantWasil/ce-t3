@@ -58,16 +58,43 @@ def unit_key(path: str) -> str:
     return os.path.join(os.path.dirname(path), os.path.splitext(TEST_MARKER.sub("", os.path.basename(path)))[0])
 
 
-def load_aliases(root: Path) -> list[tuple[str, str]]:
+def read_input(root: Path, name: str, rejected: list[dict[str, str]]) -> str | None:
+    try:
+        resolved = (root / name).resolve(strict=True)
+        if not resolved.is_relative_to(root):
+            reason = "outside_repository"
+        elif not resolved.is_file():
+            reason = "not_regular_file"
+        else:
+            return resolved.read_text(errors="ignore")
+    except (OSError, RuntimeError):
+        reason = "unreadable"
+    rejected.append({"file": name, "reason": reason})
+    return None
+
+
+def strip_jsonc(text: str) -> str:
+    # Match strings first so glob paths and URLs cannot start a comment.
+    string = r'"(?:\\.|[^"\\])*"'
+    text = re.sub(string + r'|//[^\n]*|/\*.*?\*/',
+                  lambda m: m.group(0) if m.group(0).startswith('"') else "",
+                  text, flags=re.S)
+    return re.sub(string + r'|,(\s*[}\]])',
+                  lambda m: m.group(0) if m.group(0).startswith('"') else m.group(1),
+                  text)
+
+
+def load_aliases(root: Path, rejected: list[dict[str, str]]) -> list[tuple[str, str]]:
     aliases: list[tuple[str, str]] = []
     for name in ("tsconfig.json", "jsconfig.json"):
         f = root / name
-        if not f.is_file():
+        if not f.exists() and not f.is_symlink():
             continue
-        text = re.sub(r"//[^\n]*|/\*.*?\*/", "", f.read_text(errors="ignore"), flags=re.S)
-        text = re.sub(r",(\s*[}\]])", r"\1", text)
+        text = read_input(root, name, rejected)
+        if text is None:
+            continue
         try:
-            opts = json.loads(text).get("compilerOptions", {})
+            opts = json.loads(strip_jsonc(text)).get("compilerOptions", {})
         except json.JSONDecodeError:
             continue
         base = opts.get("baseUrl", ".")
@@ -138,7 +165,7 @@ def main() -> int:
     ap.add_argument("scope", nargs="*", default=["."])
     a = ap.parse_args()
 
-    root = Path(git(Path(a.repo), "rev-parse", "--show-toplevel").strip())
+    root = Path(git(Path(a.repo), "rev-parse", "--show-toplevel").strip()).resolve()
     scopes = [os.path.relpath((Path(a.repo) / s).resolve(), root) for s in a.scope]
     scopes = ["" if s == "." else s for s in scopes]
 
@@ -167,7 +194,8 @@ def main() -> int:
             continue
         pairs.update(itertools.combinations(code, 2))
 
-    aliases = load_aliases(root)
+    rejected: list[dict[str, str]] = []
+    aliases = load_aliases(root, rejected)
     py_roots = sorted({"."} | {s for s in scopes if s} | {str(Path(s).parent) for s in scopes if s})
     tracked_code = {f for f in tracked if f.endswith(PARSED_EXT)}
     edges: set[tuple[str, str]] = set()
@@ -177,9 +205,8 @@ def main() -> int:
         if ext not in PARSED_EXT:
             unparsed[ext] += 1
             continue
-        try:
-            text = (root / f).read_text(errors="ignore")
-        except OSError:
+        text = read_input(root, f, rejected)
+        if text is None:
             continue
         if ext in JS_EXT:
             targets = (resolve_js(next(g for g in m.groups() if g), f, tracked_code, aliases) for m in JS_IMPORT.finditer(text))
@@ -215,6 +242,7 @@ def main() -> int:
         "import_edges": len(edges),
         "imports_toward_more_changed": toward_volatile,
         "imports_not_parsed": dict(unparsed),
+        "rejected_inputs": rejected,
     }, sys.stdout, indent=1)
     print()
     return 0

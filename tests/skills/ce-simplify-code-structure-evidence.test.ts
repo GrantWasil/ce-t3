@@ -14,6 +14,7 @@ const ENV = {
   GIT_CONFIG_NOSYSTEM: "1",
 }
 
+let fixtureRoot: string
 let repo: string
 
 function write(rel: string, text: string) {
@@ -44,7 +45,9 @@ const pair = (files: string[]) => files.join(" + ")
 const pairNames = (out: { co_change: CoChange[] }) => out.co_change.map((p) => pair(p.files))
 
 beforeAll(() => {
-  repo = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), "ce-simplify-evidence-")))
+  fixtureRoot = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), "ce-simplify-evidence-")))
+  repo = path.join(fixtureRoot, "repo")
+  fs.mkdirSync(repo)
   for (const args of [
     ["init", "-q", "-b", "main"],
     ["config", "user.name", "test"],
@@ -53,7 +56,7 @@ beforeAll(() => {
   ]) git(args)
 
   commit("seed", {
-    "tsconfig.json": '{\n  // comment\n  "compilerOptions": { "paths": { "@/*": ["./src/*"] }, },\n}\n',
+    "tsconfig.json": '{\n  // comment\n  "compilerOptions": { "paths": { "@/*": ["./src/*"] }, /* alias policy */ },\n}\n',
     "src/core/limits.ts": 'import { PROMO } from "@/campaigns/promo"\nexport const MAX = PROMO\n',
     "src/campaigns/promo.ts": "export const PROMO = 1\n",
     "src/campaigns/promo.test.ts": 'import { PROMO } from "./promo"\n',
@@ -85,7 +88,7 @@ beforeAll(() => {
 })
 
 afterAll(() => {
-  fs.rmSync(repo, { recursive: true, force: true })
+  fs.rmSync(fixtureRoot, { recursive: true, force: true })
 })
 
 describe("structure-evidence.py", () => {
@@ -118,6 +121,29 @@ describe("structure-evidence.py", () => {
       imported: "src/campaigns/promo.ts",
       changes: [1, 4],
     })
+  })
+
+  test("rejects source and config symlinks outside the repository", () => {
+    const external = fs.mkdtempSync(path.join(repo, "..", "ce-evidence-external-"))
+    const config = fs.readFileSync(path.join(repo, "tsconfig.json"), "utf8")
+    try {
+      fs.writeFileSync(path.join(external, "secret.ts"), 'import { PROMO } from "./campaigns/promo"\n')
+      fs.writeFileSync(path.join(external, "config.json"), config)
+      fs.symlinkSync(path.join(external, "secret.ts"), path.join(repo, "src", "linked.ts"))
+      fs.unlinkSync(path.join(repo, "tsconfig.json"))
+      fs.symlinkSync(path.join(external, "config.json"), path.join(repo, "tsconfig.json"))
+      git(["add", "src/linked.ts"])
+      const out = evidence("src")
+      expect(out.imports_toward_more_changed.some((edge: { importer: string }) => edge.importer === "src/linked.ts")).toBe(false)
+      expect(out.rejected_inputs).toContainEqual({ file: "src/linked.ts", reason: "outside_repository" })
+      expect(out.rejected_inputs).toContainEqual({ file: "tsconfig.json", reason: "outside_repository" })
+    } finally {
+      git(["reset", "-q", "--", "src/linked.ts"])
+      fs.rmSync(path.join(repo, "src", "linked.ts"), { force: true })
+      fs.rmSync(path.join(repo, "tsconfig.json"), { force: true })
+      fs.writeFileSync(path.join(repo, "tsconfig.json"), config)
+      fs.rmSync(external, { recursive: true, force: true })
+    }
   })
 
   test("parses Python relative imports and counts files it cannot parse", () => {
