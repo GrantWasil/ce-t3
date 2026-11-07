@@ -9,10 +9,11 @@ A finished change usually carries debt you could not see while writing it: a hel
 - **Reuse** searches for existing utilities, stdlib/runtime primitives, and platform guarantees the new code reimplements
 - **Quality** flags hacky structure, dead code, context-only names, and leftover pre-release compatibility
 - **Efficiency** looks for extra work, missed concurrency, hot-path bloat, and no-op updates
+- **Structure** (when a standalone request names existing code rather than a diff) uses file history and imports to find hidden dependencies, needless coupling, surplus code, and special cases. Tests-only and comments-only requests skip this pass
 - **Test value** (when the scope has tests) flags tests that would pass even if the code were broken, tests coupled to internals, duplicate coverage, and production seams only tests use
 - **Comments** (when the scope has comments) deletes by default. A comment survives only as a license header, a note on behavior forced from outside, a public API doc, a link explaining a constraint code cannot express, a comment a tool reads, or one the project's written standards require. A comment that explains a surprise in your own code becomes a refactor that makes it unnecessary
 
-Collected review agents are released before the next batch or handoff when the harness provides caller-owned cleanup. When it does not, the review reports retained-capacity limitations without claiming that completion freed a slot.
+Each reviewer gets a fresh context; the size-cutoff combined reviewer remains one reviewer. An unavailable selected provider, model, effort, or restriction is reported without a substitute or inline replacement. Collected review agents are released before the next batch or handoff when the harness provides caller-owned cleanup. When it does not, the review reports retained-capacity limitations without claiming that completion freed a slot.
 
 When another skill runs it, it applies what is worth keeping and notes false positives as skipped without stopping to argue. When you run it yourself, it lists the findings first and applies the ones you pick, unless you tell it to just fix them. Either way it then runs project-wide typecheck and lint plus tests sized to the change, and the summary reports what was already sound, what changed, counts by category, and which checks ran.
 
@@ -25,6 +26,8 @@ This is not `ce-polish` (live UX on a working page), not `ce-code-review` (deepe
 **When another skill runs it** (`ce-work`, `lfg`, `ce-debug`'s fix handoff) or the agent runs it at a completion boundary, it works only on the current work, applies fixes without asking, and returns a summary. It prunes only tests and comments the current work added or changed; older ones in the same files stay, and a standalone audit is the way to reach them. It never touches the tests that prove the work. Callers mark these runs with `mode:pipeline` and name that test with `proof-test:<path>`.
 
 **When you run it yourself**, your request sets the scope, from your recent changes to the whole repo. It reports numbered findings grouped as delete, refactor, or encode as a test, and changes nothing until you say which to apply. Say "just fix them" or "without asking" to skip the report.
+
+For an existing-code scope, the structural pass groups findings under changes that remove them. Every proposed change must preserve each public interface, including unseen direct callers. Behavior-changing redesigns are listed as not applicable, and possible bugs are reported rather than applied as simplifications. After applying a grouped change, the structure reviewer runs once more and reports remaining findings.
 
 ---
 
