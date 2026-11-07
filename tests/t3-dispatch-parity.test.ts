@@ -84,6 +84,18 @@ describe("T3 Code dispatch adapter", () => {
     expect(adapter).toContain("Never wrap a skill invocation in a delegated task")
   })
 
+  test("simplify reviewers keep fresh contexts without substituting selected targets", async () => {
+    const dispatch = await read("ce-simplify-code", "references/reviewer-dispatch.md")
+    expect(await read("ce-simplify-code", "SKILL.md")).toContain("a selected target or restriction must not be replaced by an inline pass")
+    const selection = dispatch.split("**Model selection.**")[1]?.split("A generic subagent")[0] ?? ""
+    expect(selection).toContain("Once a target or restriction is selected")
+    expect(selection).toContain("it does not authorize inheritance or substitution")
+    expect(dispatch).toContain("Each reviewer starts in a fresh subagent")
+    expect(dispatch).toContain("do not send a reviewer to an agent that already ran another")
+    expect(dispatch).toContain("A full harness is not a reason to run a reviewer inline")
+    expect(dispatch).toContain("only when no provider, model, effort, or required restriction was selected")
+  })
+
   test("lfg preserves task checkpoints and current-session host PR waits before DONE", async () => {
     const body = await read("lfg", "SKILL.md")
     const visibility = compact(await read("lfg", "references/task-visibility.md"))
