@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.0.3](https://github.com/GrantWasil/ce-t3/compare/cursor-marketplace-v1.0.2...cursor-marketplace-v1.0.3) (2026-11-07)
+
+
+### Bug Fixes
+
+* **sync:** integrate upstream 09fd437 while preserving fork contracts ([4e1eb0c](https://github.com/GrantWasil/ce-t3/commit/4e1eb0cdf5df24779a2ba306f699afc04e86fed3))
+* **sync:** integrate upstream babysit and sweep guards ([1102f09](https://github.com/GrantWasil/ce-t3/commit/1102f098ec95c8c707463c19c96140967ca68751))
+* **sync:** integrate upstream lifecycle and sweep updates ([513671c](https://github.com/GrantWasil/ce-t3/commit/513671c553a4620cbcd76427fece080f0a20651c))
+* **sync:** integrate upstream review sizing and eval infrastructure ([e74aa63](https://github.com/GrantWasil/ce-t3/commit/e74aa630d4eef0e4f84cd1f70b77c1f3499600de))
+* **sync:** integrate upstream setup and caller updates ([5a2838d](https://github.com/GrantWasil/ce-t3/commit/5a2838da8d9b7aebe29e4a7e392585ce4c446d64))
+* **sync:** integrate upstream setup modes and caller outcomes ([ab01cf1](https://github.com/GrantWasil/ce-t3/commit/ab01cf1374a6f07ad41c6596fdab87ef3abc6e19))
+
 ## [1.0.2](https://github.com/EveryInc/compound-engineering-plugin/compare/cursor-marketplace-v1.0.1...cursor-marketplace-v1.0.2) (2026-06-24)
 
 
